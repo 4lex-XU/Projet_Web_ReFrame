@@ -6,7 +6,7 @@ const mocha = require('mocha');
 
 // Configurer chai
 chai.use(chaiHttp);
-chai.should();
+chai.should(); 
 
 mocha.describe("Test de l'API user", () => {
     mocha.it("user", (done) => {
