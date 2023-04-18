@@ -1,0 +1,69 @@
+body{
+    display: flex;
+    flex-direction: column;
+}
+
+header{
+    display: flex;
+}
+
+#logo{
+    width: 20%;
+    height: 100px;
+}
+
+img{
+    display: block;
+    margin-left: 30%;
+    margin-right: 30%;
+    width: 40%;
+    height: 100%;
+}
+
+#search{
+    width: 50%;
+    background-color: rgb(199, 199, 255);
+}
+
+#connect{
+    width: 30%;
+    background-color: rgb(161, 255, 161);
+}
+
+main{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+}
+
+aside{
+    width: 20%;
+    background-color: blueviolet;
+}
+
+section{
+    display: flex;
+    width: 80%;
+    height: 100%;
+    flex-direction: column;
+}
+
+#new_comment{
+    width: 100%;
+    height: 100%;
+    background-color: yellowgreen;
+}
+
+.listComment{
+    width: 100%;
+    background-color: rgb(200, 200, 200);
+}
+
+.comment{
+    margin: 0.5rem;
+    padding: 0.3rem;
+    font-size: 1.2rem;
+    background: white
+}
+
+

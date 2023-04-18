@@ -1,0 +1,27 @@
+.mainpage {
+  font-family: sans-serif;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.068);
+  min-width: 400px;
+}
+
+.reframe {
+  padding: 1px;
+  background-color: rgb(133, 147, 207);
+}
+
+header {
+  padding: 1px;
+  background-color: rgba(133, 147, 207, 0.5);
+}
+
+a {
+  margin: 10px;
+  font-weight: bold;
+  text-decoration: none;
+  color: rgba(83, 90, 187, 0.726);
+}
+
+a:hover {
+  text-decoration: underline;
+}

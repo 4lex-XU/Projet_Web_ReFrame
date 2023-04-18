@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Page</title>
+        <link rel="stylesheet" href="../CSS/mise_en_page.css">
+    </head>
+    <body>
+        <header>
+            <div id="logo">
+                <img src="../DATA/moustillon.jpeg" alt="logo"/>
+            </div>
+            <div id="search">
+                <label for="search">Recherche</label>
+                <input id="search" name="search" type="text"/>
+                <button type="submit">Recherche</button>
+                <label for="contacts">contacts</label>
+                <input id="contacts" name="contacts" type="checkbox"/>
+            </div>
+            <div id="connect">
+                <ul>
+                    <li>
+                        <a href="./connexion.html">connexion</a>
+                    </li>
+                    <li>
+                        <a href="./enregistrement.html">enregistrement</a>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <main>
+            <aside></aside>
+            <section>
+                <div id="new_comment">
+                    <label for="comment">Saisie</label>
+                    <textarea id="comment" name="comment" rows="5" cols="33">Nouveau commentaire</textarea>
+                    <button type="submit">Ajout</button>
+                </div>
+                <article class="listComment">
+                    <article class="comment">
+                        <p>
+                            Hello World<br>
+                            3 fevrier 2023<br>
+                            <a href="./user.html">Pika</a><br>
+                        </p>
+                        <button type="submit">+</button>
+                    </article>
+                    <article class="comment">
+                        <p>
+                            Hello<br>
+                            3 fevrier 2023<br>
+                            <a href="./user.html">Pikachu</a><br>
+                        </p>
+                        <button type="submit">+</button>
+                    </article>
+                </article>
+            </section>
+        </main>
+    </body>
+</html>
