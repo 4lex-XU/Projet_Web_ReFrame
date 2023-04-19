@@ -68,7 +68,8 @@ function init(db) {
             req.session.login = login;
             res.status(200).json({
               status: 200,
-              message: "Connexion réussie"
+              message: "Connexion réussie",
+              userid: userid
             });
           }
         });
@@ -242,7 +243,7 @@ function init(db) {
   //MESSAGES
 
   // CREATE MESSAGE
-  router.put("/user/:login/newMessage", async(req, res) => {
+  router.put("/user/newMessage", async(req, res) => {
     if(!req.session.userid) {
       res.status(401).json({ 
         status: 401, 
@@ -250,15 +251,22 @@ function init(db) {
       });
       return;
     }
-    const { login, date, texte } = req.body;
-    if (!login || !date || !texte) {
+    const { login, date, clock, content } = req.body;
+    if (!login || !date || !clock ) {
       res.status(400).json({
         status: 400,
         message: "Champs manquants"
       });
       return;
     }
-    if (!(await users.exists(client, req.params.login))) {
+    if (!content) {
+      res.status(400).json({
+        status: 400,
+        message: "Message vide"
+      });
+      return;
+    }
+    if (!(await users.exists(client, login))) {
       res.status(404).json({
         status: 404,
         message: "Utilisateur n'existe pas"
@@ -266,7 +274,7 @@ function init(db) {
       return;
     }
     messages
-      .create(client, login, date, texte)
+      .create(client, login, date, clock, content)
       .then((result) => res.status(201).send(result))
       .catch((e) =>
         res.status(500).json({

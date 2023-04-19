@@ -7,12 +7,13 @@ class Messages {
     this.db = db;
   }
 
-  create(client, login, date, texte) {
+  create(client, login, date, clock, content) {
     return new Promise((resolve, reject) => {
         const newMess = {
             login,
             date,
-            texte,
+            clock,
+            content
         };
         client
           .db(dbName)

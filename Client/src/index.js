@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import axios from "axios";
-import MainPage from "./MainPage";
+import MainPage from "./Composants/MainPage";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);
