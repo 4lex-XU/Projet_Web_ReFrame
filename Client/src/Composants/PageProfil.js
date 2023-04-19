@@ -5,14 +5,13 @@ import Logout from "./Logout";
 import axios from "axios";
 
 export default function PageProfil(props) {
-  const userProfil = props.userProfil;
-  const userLogin = props.login;
   const [isAbonne, setIsAbonne] = useState(false);
   const [listeAbonne, setListeAbonne] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [rechargerMessages, setRechargerMessages] = useState(false);
 
   useEffect(() => {
-    axios.get(`/user/${props.myLogin}/messages`, {
+    axios.get(`/user/${props.userProfil}/messages`, {
       headers: {
         'Content-Type': 'application/json'
       },
@@ -25,20 +24,24 @@ export default function PageProfil(props) {
       .catch((err) => {
         console.log(err);
       });
-  }, [messages]);
+  }, [rechargerMessages]);
+
+  const rechargerMessagesHandler = () => {
+    setRechargerMessages(!rechargerMessages);
+  };
 
   const isFriend = (evt) => {
     evt.preventDefault();
-    let newAbonne = props.login;
+    /*let newAbonne = props.login;
     setListeAbonne([...listeAbonne, newAbonne]);
-    setIsAbonne(true);
+    setIsAbonne(true);*/
   };
 
   const notFriend = (evt) => {
-    evt.preventDefault();
+    /*evt.preventDefault();
     let oldAbonne = props.login;
     setListeAbonne(listeAbonne.filter((abonne) => abonne !== oldAbonne));
-    setIsAbonne(false);
+    setIsAbonne(false);*/
   };
 
   const handleEdit = () => <EditerProfil />;
@@ -46,14 +49,12 @@ export default function PageProfil(props) {
     evt.preventDefault();
     props.setCurrentPage("home_page");
   };
-  
+
   return (
     <div className="profil">
-      <div>{props.login}</div>
-      <div>{props.description}</div>
-      <div>{props.anniversaire}</div>
+      <div>{props.userProfil}</div>
       <button onClick="">Amis</button>
-      {userLogin === userProfil ? (
+      {props.myLogin === props.userProfil ? (
         <button onClick={handleEdit}>Editer le profil</button>
       ) : isAbonne === false ? (
         <button onClick={isFriend}>Suivre</button>
@@ -63,8 +64,14 @@ export default function PageProfil(props) {
       <a className="homePage" href="a" onClick={homePageHandler}>
           Page d'acceuil
       </a>
+      <button id="recharger" onClick={rechargerMessagesHandler}>
+        Recharger les messages
+      </button>
       <div>
-        <ListeMessages messages={messages.reverse()} />
+        <ListeMessages 
+          messages={messages} 
+          setCurrentPage={props.setCurrentPage}
+        />
       </div>
       <Logout setLogout={props.logout} />
     </div>

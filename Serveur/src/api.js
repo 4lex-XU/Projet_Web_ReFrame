@@ -318,6 +318,25 @@ function init(db) {
       }
   });
 
+  // GET ALL MESSAGES -> retourne la liste de message de tous les utilisateurs
+  router
+    .get("/user/messages", async (req, res) => {
+    try {
+      const mess = await messages.getAll(client);
+      if(mess.length == 0) {
+        res.status(202).send("Aucun message trouvé")
+      } else {
+        res.status(200).send(mess)
+      }
+    } catch (e) {
+        res.status(500).json({
+          status: 500,
+          message: "Erreur interne",
+          details: (e || "Erreur inconnue").toString()
+        })
+      }
+  });
+  
   // DELETE MESSAGE 
   router.delete("/user/:login/messages/:indice", async(req, res, next) => {
     if(!req.session.userid) {

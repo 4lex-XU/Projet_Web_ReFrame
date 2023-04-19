@@ -25,7 +25,14 @@ class Messages {
               .db(dbName)
               .collection(colName)
               .updateOne({login: {$eq: login}}, { $set: { messages: user.messages } })
-              .then(result => {resolve("Nouveau message publié");})
+              .then(result => {
+                client
+                  .db(dbName)
+                  .collection('Messages')
+                  .insertOne(newMess)
+                  .then(result => {resolve("Nouveau message publié")})
+                  .catch(error => {reject(error);});
+              })
               .catch(error => {reject(error);});
           })
           .catch(error => {reject(error);});
@@ -40,6 +47,18 @@ class Messages {
       .findOne({ login: {$eq:login} })
       .then(user => {resolve(user.messages)})
       .catch(error => {reject(error)});
+    })
+  }
+
+  getAll(client) {
+    return new Promise((resolve, reject) => {
+      client
+        .db(dbName)
+        .collection('Messages')
+        .find()
+        .toArray()
+        .then(messages => {resolve(messages)})
+        .catch(error => {reject(error)});
     })
   }
 

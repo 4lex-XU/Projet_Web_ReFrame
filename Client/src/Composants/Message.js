@@ -1,9 +1,12 @@
 export default function Message(props) {
-
+  const pageProfilHandler = (evt) => {
+    evt.preventDefault();
+    props.setCurrentPage(props.login);
+  };
   return (
     <article className="message">
       <div>
-        <a className="user" href="profil_user">
+        <a className="user" href="a" onClick={pageProfilHandler}>
           {props.login}
         </a>{" "}
         <button type="button">+</button>

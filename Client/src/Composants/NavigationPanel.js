@@ -18,6 +18,7 @@ export default function NavigationPanel(props) {
         ) : (
           <PageProfil
             myLogin={props.myLogin}
+            userProfil={props.currentPage}
             logout={props.logout}
             setCurrentPage={props.setCurrentPage}
           />

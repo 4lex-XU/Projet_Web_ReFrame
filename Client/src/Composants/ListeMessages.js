@@ -11,6 +11,7 @@ export default function ListeMessages(props) {
           content={message.content}
           date={message.date}
           clock={message.clock}
+          setCurrentPage={props.setCurrentPage}
         />
       ))}
     </div>
