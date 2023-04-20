@@ -372,12 +372,12 @@ function init(db) {
   });
 
   //LIKER MESSAGE
-  router.post("/user/:login/messages/:mess_login/:indice/:like_login", async(req, res) => {
+  router.post("/messages/like/:login/:login_mess", async(req, res) => {
     if(!req.session.userid) {
       res.status(401).json({ status: 401, message: "Non connecté" });
       return;
     }
-    if (!(await users.exists(client, req.params.like_login))) {
+    if (!(await users.exists(client, req.params.login))) {
       res.status(404).json({
         status: 404,
         message: "Utilisateur n'existe pas"
@@ -385,7 +385,7 @@ function init(db) {
       return;
     }
     messages
-      .like(client, req.params.login, req.params.mess_login, req.params.indice, req.params.like_login)
+      .like(client, req.params.login, req.params.login_mess, req.params.login)
       .then(result => {res.status(200).send(result)})
       .catch(error => {
         res.status(500).json({

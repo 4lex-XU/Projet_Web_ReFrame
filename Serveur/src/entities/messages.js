@@ -13,7 +13,12 @@ class Messages {
             login,
             date,
             clock,
-            content
+            content, 
+            likes: {
+              count: 0,
+              login: []
+            },
+            comment: []
         };
         client
           .db(dbName)
@@ -82,16 +87,26 @@ class Messages {
     });
   };
 
-  like(client, login, mess_login, pos, newlike_login) {
+  like(client, login, login_mess, login_like) {
     return new Promise((resolve, reject) => {
       client
-        .db("base1")
-        .collection("Users")
+        .db(dbName)
+        .collection(colName)
         .updateOne(
-          { login: {$eq: login}, messages: {login: {$eq: mess_login}} },
-          { $push: {'messages.$.like.like_login': newlike_login } } 
+          { login: {$eq: login}, "messages.login": {$eq: login_mess} },
+          { $push: { "messages.$.likes.login": login_like } },
         )
-        .then(result => {resolve("+1")})
+        .then(result => {
+          client
+            .db(dbName)
+            .collection(colName)
+            .updateOne(
+              { login: {$eq: login}, "messages.login": {$eq: login_mess} },
+              { $inc: { "messages.$.likes.count": 1 }}
+            )
+            .then(result => {resolve("+1")})
+            .catch(error => {reject(error)})
+          })
         .catch(error => {reject(error)})
     })
   };
