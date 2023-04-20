@@ -212,6 +212,7 @@ function init(db) {
       return;
     }
     const { login, password, confirmpassword, lastname, firstname } = req.body;
+    /*
     if (!login || !password || !confirmpassword || !lastname || !firstname) {
       res.status(400).json({
         status: 400,
@@ -219,6 +220,7 @@ function init(db) {
       });
       return;
     }
+    */
     if (await users.exists(client, login)) {
       res.status(403).json({
         status: 403,
@@ -385,7 +387,7 @@ function init(db) {
       return;
     }
     messages
-      .like(client, req.params.login, req.params.login_mess, req.params.login)
+      .like(client, req.params.login, req.params.login_mess)
       .then(result => {res.status(200).send(result)})
       .catch(error => {
         res.status(500).json({

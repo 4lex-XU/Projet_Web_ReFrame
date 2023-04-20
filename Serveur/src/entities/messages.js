@@ -87,14 +87,14 @@ class Messages {
     });
   };
 
-  like(client, login, login_mess, login_like) {
+  like(client, login, login_mess) {
     return new Promise((resolve, reject) => {
       client
         .db(dbName)
         .collection(colName)
         .updateOne(
-          { login: {$eq: login}, "messages.login": {$eq: login_mess} },
-          { $push: { "messages.$.likes.login": login_like } },
+          { "messages.login": {$eq: login_mess} },
+          { $push: { "messages.$.likes.login": login } },
         )
         .then(result => {
           client

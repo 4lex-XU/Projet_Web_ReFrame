@@ -113,12 +113,10 @@ class Users {
   
   edit(client, oldlogin, login, password, lastName, firstName) {
     return new Promise((resolve, reject) => {
-      const update = {
-        login,
-        password,
-        lastName,
-        firstName,
-      }
+      const update = {}
+      if(login != undefined)
+
+
       client
         .db(dbName)
         .collection(colName)
