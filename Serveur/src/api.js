@@ -319,8 +319,7 @@ function init(db) {
   });
 
   // GET ALL MESSAGES -> retourne la liste de message de tous les utilisateurs
-  router
-    .get("/user/messages", async (req, res) => {
+  router.get("/messages/getAll", async (req, res) => {
     try {
       const mess = await messages.getAll(client);
       if(mess.length == 0) {
@@ -329,9 +328,9 @@ function init(db) {
         res.status(200).send(mess)
       }
     } catch (e) {
-        res.status(500).json({
-          status: 500,
-          message: "Erreur interne",
+        res.status(500).json({ 
+          status: 500, 
+          message: "Erreur interne", 
           details: (e || "Erreur inconnue").toString()
         })
       }

@@ -20,13 +20,7 @@ export default function HomePage(props) {
   };
 
   useEffect(() => {
-    axios.get(`/user/${props.myLogin}/messages`, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true,
-      credentials: 'include'
-    })
+    axios.get(`/messages/getAll`)
       .then((res) => {
         setMessages(res.data.reverse());
       })

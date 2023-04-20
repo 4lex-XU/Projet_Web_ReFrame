@@ -50,10 +50,12 @@ export default function PageProfil(props) {
     props.setCurrentPage("home_page");
   };
 
+  const getListAmis = () => {
+  };
   return (
     <div className="profil">
       <div>{props.userProfil}</div>
-      <button onClick="">Amis</button>
+      <button onClick={getListAmis}>Amis</button>
       {props.myLogin === props.userProfil ? (
         <button onClick={handleEdit}>Editer le profil</button>
       ) : isAbonne === false ? (
@@ -62,7 +64,7 @@ export default function PageProfil(props) {
         <button onClick={notFriend}>Ne plus suivre</button>
       )}
       <a className="homePage" href="a" onClick={homePageHandler}>
-          Page d'acceuil
+          Page d'accueil
       </a>
       <button id="recharger" onClick={rechargerMessagesHandler}>
         Recharger les messages

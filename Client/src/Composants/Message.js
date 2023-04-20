@@ -8,8 +8,7 @@ export default function Message(props) {
       <div>
         <a className="user" href="a" onClick={pageProfilHandler}>
           {props.login}
-        </a>{" "}
-        <button type="button">+</button>
+        </a>
       </div>
       <div className="content">
         <textarea
