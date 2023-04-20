@@ -95,7 +95,6 @@ function init(db) {
   // LOGOUT
   router.post("/user/logout", async (req, res) => {
     try {
-      console.log(req.headers)
       if(!req.session.userid) {
         res.status(401).json({ 
           status: 401, 
@@ -130,11 +129,11 @@ function init(db) {
   });
 
   router
-    .route("/user/:user_id")
-  // GET USER -> retourne un seul utilisateur dont l'id est passé dans l'url
+    .route("/user/:login")
+  // GET USER -> retourne un seul utilisateur dont le login est passé dans l'url
     .get(async (req, res) => {
       try {
-        const user = await users.get(client, req.params.user_id);
+        const user = await users.get(client, req.params.login);
         if (!user) {
           res.status(404).json({
             status: 404,
@@ -152,9 +151,9 @@ function init(db) {
       }
     })
 
-  // DELETE USER -> supprime un seul utilisateur dont l'id est passé dans l'url
+  // DELETE USER -> supprime un seul utilisateur dont le login est passé dans l'url
     .delete((req, res, next) => {
-      if(req.session.userid != req.params.user_id) {
+      if(!req.session.userid) {
         res.status(401).json({ 
           status: 401, 
           message: "Non connecté" 
@@ -162,8 +161,19 @@ function init(db) {
         return;
       }
       users
-        .delete(client, req.params.user_id)
-        .then((result) => {res.status(200).send(`Supression de l'utilisateur ${req.params.user_id} réussie`)})
+        .delete(client, req.params.login)
+        .then((result) => {
+          messages
+            .deleteAll(client, req.params.login)
+            .then((result => {res.status(200).send(`Supression de l'utilisateur ${req.params.login} et de ses messages réussi`)}))
+            .catch((e) => {
+              res.status(500).json({ 
+                status: 500, 
+                message: "Erreur interne", 
+                details: (e || "Erreur inconnue").toString()
+              })
+            })
+          })
         .catch((e) => {
           res.status(500).json({ 
             status: 500, 
@@ -213,15 +223,14 @@ function init(db) {
       return;
     }
     const { login, password, confirmpassword, lastname, firstname } = req.body;
-    /*
-    if (!login || !password || !confirmpassword || !lastname || !firstname) {
-      res.status(400).json({
-        status: 400,
-        message: "Champs manquants"
+    if (!(await users.exists(client, req.params.login))) {
+      res.status(403).json({
+        status: 403,
+        message: "Utilisateur introuvable",
+        detail: `${req.params.login} n'existe pas`
       });
       return;
     }
-    */
     if (await users.exists(client, login)) {
       res.status(403).json({
         status: 403,
@@ -340,7 +349,7 @@ function init(db) {
   });
   
   // DELETE MESSAGE 
-  router.delete("/user/:login/messages/:indice", async(req, res, next) => {
+  router.delete("/user/:userId/messages", async(req, res, next) => {
     if(!req.session.userid) {
       res.status(401).json({ 
         status: 401, 
@@ -348,15 +357,8 @@ function init(db) {
       });
       return;
     }
-    if (!(await users.exists(client, req.params.login))) {
-      res.status(404).json({
-        status: 404,
-        message: "Utilisateur n'existe pas"
-      });
-      return;
-    }
     messages
-      .delete(client, req.params.login, req.params.indice)
+      .delete(client, req.params.userId)
       .then((result) => {res.status(201).send(result)})
       .catch((e) =>{
         if(e === "Message non trouvé"){
@@ -431,7 +433,7 @@ function init(db) {
       });
       return;
     }
-    if (await friends.getFriend(client, req.params.login, friend_login)) {
+    if (await friends.getFriend(client, req.params.login, friend_login) == true) {
       res.status(401).json({
         status: 401,
         message: "Déjà ami"
@@ -492,7 +494,7 @@ function init(db) {
       });
       return;
     }
-    if (!(await friends.getFriend(client, req.params.login, req.params.friend_login))) {
+    if (await friends.getFriend(client, req.params.login, req.params.friend_login) == false) {
       res.status(404).json({
         status: 404,
         message: "Ami non trouvé"

@@ -43,9 +43,9 @@ class Friends {
           .then(user => {
             const userfriend = user.friends.filter(item => item.friend_login.toLowerCase().includes(friend_login.toLowerCase()));
             if(userfriend.length == 0) {
-              resolve(null)
+              resolve(false)
             } else {
-              resolve(userfriend)
+              resolve(true)
             }  
           })
           .catch(err => {reject(err)})

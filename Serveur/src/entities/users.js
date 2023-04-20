@@ -14,7 +14,6 @@ class Users {
         password,
         lastName,
         firstName,
-        messages: [],
         friends: []
       };
       client
@@ -27,12 +26,12 @@ class Users {
   }
 
   //Renvoie l'utilisateur dont l'id correspond à celui en paramètre
-  get(client, userId) {
+  get(client, login) {
     return new Promise((resolve, reject) => {
       client
         .db(dbName)
         .collection(colName)
-        .findOne({ _id: { $eq: new ObjectId(userId) } })
+        .findOne({ login: { $eq: login } })
         .then((user) => {resolve(user)})
         .catch((error) => {reject(error)});
     });
@@ -77,32 +76,15 @@ class Users {
     });
   }
 
-  delete(client, userId) {
+  delete(client, login) {
     return new Promise((resolve, reject) => {
       client
         .db(dbName)
         .collection(colName)
-        .deleteOne({ _id: { $eq: new ObjectId(userId) } })
+        .deleteOne({ login: { $eq: login } })
         .then((user) => {
           if (user) {
             resolve(user.insertedId);
-          } else {
-            resolve(null);
-          }
-        })
-        .catch((error) => {reject(error)});
-    });
-  }
-
-  getByLogin(client, login) {
-    return new Promise((resolve, reject) => {
-      client
-        .db(dbName)
-        .collection(colName)
-        .findOne({ login: { $eq: login } })
-        .then((user) => {
-          if (user) {
-            resolve(user);
           } else {
             resolve(null);
           }
@@ -114,9 +96,18 @@ class Users {
   edit(client, oldlogin, login, password, lastName, firstName) {
     return new Promise((resolve, reject) => {
       const update = {}
-      if(login != undefined)
-
-
+      if(login !== undefined) {
+        update["login"] = login
+      }
+      if(password !== undefined) {
+        update["password"] = password
+      }
+      if(lastName !== undefined) {
+        update["lastName"] = lastName
+      }
+      if(firstName !== undefined) {
+        update["firstName"] = firstName
+      }
       client
         .db(dbName)
         .collection(colName)

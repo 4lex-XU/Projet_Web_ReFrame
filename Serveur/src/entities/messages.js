@@ -1,4 +1,6 @@
+const { error } = require("console");
 const { ObjectId } = require("mongodb");
+const { resolve } = require("path");
 const dbName = "base1"
 const colName = "Users"
 
@@ -9,48 +11,33 @@ class Messages {
 
   create(client, login, date, clock, content) {
     return new Promise((resolve, reject) => {
-        const newMess = {
-            login,
-            date,
-            clock,
-            content, 
-            likes: {
-              count: 0,
-              login: []
-            },
-            comment: []
-        };
-        client
-          .db(dbName)
-          .collection(colName)
-          .findOne({ login: {$eq: login} })
-          .then(user => {
-            user.messages.push(newMess);
-            client
-              .db(dbName)
-              .collection(colName)
-              .updateOne({login: {$eq: login}}, { $set: { messages: user.messages } })
-              .then(result => {
-                client
-                  .db(dbName)
-                  .collection('Messages')
-                  .insertOne(newMess)
-                  .then(result => {resolve("Nouveau message publié")})
-                  .catch(error => {reject(error);});
-              })
-              .catch(error => {reject(error);});
-          })
-          .catch(error => {reject(error);});
-    });
+      const newMess = {
+          login,
+          date,
+          clock,
+          content, 
+          likes: {
+            count: 0,
+            login: []
+          },
+          comment: []
+      };
+      client
+        .db(dbName)
+        .collection("Messages")
+        .insertOne(newMess)
+        .then((result) => {resolve(result.insertedId)})
+        .catch((error) => {reject(error)})
+    })    
   }
 
   get(client, login) {
     return new Promise((resolve, reject) => {
       client
       .db(dbName)
-      .collection(colName)
-      .findOne({ login: {$eq:login} })
-      .then(user => {resolve(user.messages)})
+      .collection("Messages")
+      .findMany({ login: {$eq:login} })
+      .then(user => {resolve(user)})
       .catch(error => {reject(error)});
     })
   }
@@ -67,25 +54,27 @@ class Messages {
     })
   }
 
-  delete(client, login, indice) {
+  delete(client, userId) {
     return new Promise((resolve, reject) => {
       client
         .db(dbName)
-        .collection(colName)
-        .findOne({ login: {$eq:login} })
-        .then(user => {
-          if(user.messages.length < parseInt(indice)+1) {reject("Message non trouvé")}
-          user.messages.splice(indice, 1)
-          client
-            .db(dbName)
-            .collection(colName)
-            .updateOne({login: {$eq: login}}, { $set: { messages: user.messages } })
-            .then(result => {resolve("Message supprimé")})
-            .catch(error => {reject(error)})
-        })
-        .catch(error => {reject(error)})
+        .collection("Messages")
+        .deleteOne({ _id: { $eq: new ObjectId(userId) } })
+        .then((user) => {resolve("Suppression du message réussi")})
+        .catch((error) => {reject(error)});
     });
-  };
+  } 
+
+  deleteAll(client, login){
+    return new Promise((resolve, reject) => {
+      client
+        .db(dbName)
+        .collection("Messages")
+        .deleteMany({login: {$eq: login}})
+        .then(result => {resolve("Suppression des messages réussi")})
+        .catch(error => reject(error))
+    })
+  }
 
   like(client, login, login_mess) {
     return new Promise((resolve, reject) => {
