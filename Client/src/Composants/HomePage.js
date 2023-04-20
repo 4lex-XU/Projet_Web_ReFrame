@@ -40,14 +40,14 @@ export default function HomePage(props) {
           Mon Profil
         </a>
         <BarreRecherche />
+        <button id="saisie" onClick={handlerSaisie}>
+          NouvelFrame
+        </button>
+        <button id="recharger" onClick={rechargerMessagesHandler}>
+          Recharger les messages
+        </button>
       </div>
       {saisir && <SaisieMessage myLogin={props.myLogin}/>}
-      <button id="saisie" onClick={handlerSaisie}>
-        NouvelFrame
-      </button>
-      <button id="recharger" onClick={rechargerMessagesHandler}>
-        Recharger les messages
-      </button>
       <article className="listeMsg">
         <ListeMessages 
           messages={messages} 

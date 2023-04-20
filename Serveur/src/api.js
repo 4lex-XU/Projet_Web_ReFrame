@@ -95,6 +95,7 @@ function init(db) {
   // LOGOUT
   router.post("/user/logout", async (req, res) => {
     try {
+      console.log(req.headers)
       if(!req.session.userid) {
         res.status(401).json({ 
           status: 401, 

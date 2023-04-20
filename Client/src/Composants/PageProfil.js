@@ -50,19 +50,43 @@ export default function PageProfil(props) {
     props.setCurrentPage("home_page");
   };
 
+  const handleDelete = () => {
+    axios.delete(`/user/${props.myLogin}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      withCredentials: true,
+      credentials: 'include'
+    })
+      .then((res) => {
+        console.log(res.data);
+        props.setLogout();
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  };
+
   const getListAmis = () => {
   };
   return (
     <div className="profil">
       <div>{props.userProfil}</div>
       <button onClick={getListAmis}>Amis</button>
+      
+
       {props.myLogin === props.userProfil ? (
-        <button onClick={handleEdit}>Editer le profil</button>
+        <div>
+          <button onClick={handleEdit}>Editer le profil</button>
+          <button onClick={handleDelete}>Supprimer mon compte</button> 
+        </div>
       ) : isAbonne === false ? (
         <button onClick={isFriend}>Suivre</button>
       ) : (
         <button onClick={notFriend}>Ne plus suivre</button>
       )}
+
+
       <a className="homePage" href="a" onClick={homePageHandler}>
           Page d'accueil
       </a>
