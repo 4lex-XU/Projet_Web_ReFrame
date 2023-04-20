@@ -5,8 +5,7 @@ import Logout from "./Logout";
 import axios from "axios";
 
 export default function PageProfil(props) {
-  const [isAbonne, setIsAbonne] = useState(false);
-  const [listeAbonne, setListeAbonne] = useState([]);
+  const [isAbonne, setIsAbonne] = useState(true);
   const [messages, setMessages] = useState([]);
   const [rechargerMessages, setRechargerMessages] = useState(false);
 
@@ -30,18 +29,46 @@ export default function PageProfil(props) {
     setRechargerMessages(!rechargerMessages);
   };
 
-  const isFriend = (evt) => {
+  const Follow = (evt) => {
     evt.preventDefault();
-    /*let newAbonne = props.login;
-    setListeAbonne([...listeAbonne, newAbonne]);
-    setIsAbonne(true);*/
+    const data = {
+      friend_login: props.userProfil
+    };
+    axios.put(`/user/${props.myLogin}/newfriend`, data,{
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      withCredentials: true,
+      credentials: 'include'
+    })
+      .then((res) => {
+        console.log(res.data);
+        setIsAbonne(true);
+      })  
+      .catch((err) => {
+        console.log(err.response.data);
+      });
   };
 
-  const notFriend = (evt) => {
-    /*evt.preventDefault();
-    let oldAbonne = props.login;
-    setListeAbonne(listeAbonne.filter((abonne) => abonne !== oldAbonne));
-    setIsAbonne(false);*/
+  const unFollow = (evt) => {
+    evt.preventDefault();
+    axios
+      .delete(`/user/${props.myLogin}/${props.userProfil}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true,
+        credentials: 'include'
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsAbonne(false);
+      }
+      )
+      .catch((err) => {
+        console.log(err.response.data);
+      }
+      );
   };
 
   const handleEdit = () => <EditerProfil />;
@@ -81,9 +108,9 @@ export default function PageProfil(props) {
           <button onClick={handleDelete}>Supprimer mon compte</button> 
         </div>
       ) : isAbonne === false ? (
-        <button onClick={isFriend}>Suivre</button>
+        <button onClick={Follow}>Suivre</button>
       ) : (
-        <button onClick={notFriend}>Ne plus suivre</button>
+        <button onClick={unFollow}>Ne plus suivre</button>
       )}
 
 
