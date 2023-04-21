@@ -9,6 +9,7 @@ export default function HomePage(props) {
   const [saisir, setSaisir] = useState(false);
   const [messages, setMessages] = useState([]);
   const [rechargerMessages, setRechargerMessages] = useState(false);
+  const [faitRecherche, setFaitRecherche] = useState(false);
 
   const handlerSaisie = (evt) => {
     if (saisir) setSaisir(false);
@@ -48,12 +49,18 @@ export default function HomePage(props) {
         </button>
       </div>
       {saisir && <SaisieMessage myLogin={props.myLogin}/>}
-      <article className="listeMsg">
-        <ListeMessages 
-          messages={messages} 
-          setCurrentPage={props.setCurrentPage}
-        />
-      </article>
+      {faitRecherche ? (
+        <div className="resultatRecherche">
+          <h2>Résultat de la recherche</h2>
+        Z</div>
+          ) : (
+        <article className="listeMsg">
+          <ListeMessages 
+            messages={messages} 
+            setCurrentPage={props.setCurrentPage}
+          />
+        </article>          
+      )}
       <footer>
         <Logout setLogout={props.logout} />
       </footer>

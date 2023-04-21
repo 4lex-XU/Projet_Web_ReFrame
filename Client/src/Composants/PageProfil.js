@@ -5,9 +5,13 @@ import Logout from "./Logout";
 import axios from "axios";
 
 export default function PageProfil(props) {
-  const [isAbonne, setIsAbonne] = useState(true);
+  const [isAbonne, setIsAbonne] = useState(null);
   const [messages, setMessages] = useState([]);
   const [rechargerMessages, setRechargerMessages] = useState(false);
+
+  useEffect(() => {
+    axios.get
+  })
 
   useEffect(() => {
     axios.get(`/user/${props.userProfil}/messages`, {

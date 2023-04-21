@@ -256,6 +256,7 @@ function init(db) {
 
   // CREATE MESSAGE
   router.put("/user/newMessage", async(req, res) => {
+    console.log(req.session.login)
     if(!req.session.userid) {
       res.status(401).json({ 
         status: 401, 

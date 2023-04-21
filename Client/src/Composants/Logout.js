@@ -6,16 +6,16 @@ export default function Logout(props) {
       headers: {
         'Content-Type': 'application/json'
       },
-      withCredentials: true,
+      withCredentials: true, 
       credentials: 'include'
     })
       .then((res) => {
         console.log(res.data);
-        props.setLogout();
       })
       .catch((err) => {
         console.log(err.response.data);
       });
+    props.setLogout();
   };
 
   return (
