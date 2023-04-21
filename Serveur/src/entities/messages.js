@@ -36,8 +36,9 @@ class Messages {
       client
       .db(dbName)
       .collection("Messages")
-      .findMany({ login: {$eq:login} })
-      .then(user => {resolve(user)})
+      .find({ login: login })
+      .toArray()
+      .then(messages => {resolve(messages)})
       .catch(error => {reject(error)});
     })
   }

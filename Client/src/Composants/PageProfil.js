@@ -21,7 +21,7 @@ export default function PageProfil(props) {
         setMessages(res.data.reverse());
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.response.data);
       });
   }, [rechargerMessages]);
 
