@@ -13,7 +13,7 @@ export default function BarreRecherche(props) {
   function handleSubmit(evt) {
     evt.preventDefault();
     const data = {
-      recherche: recherche
+      filter: recherche
     }
     axios.get(`/recherche`, recherche, {
       headers: {
