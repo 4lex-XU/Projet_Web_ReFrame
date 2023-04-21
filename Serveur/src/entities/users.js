@@ -116,6 +116,25 @@ class Users {
         .catch(err => reject(err))
     });
   }
+
+  filterLogin(client, filter) {
+    return new Promise((resolve, reject) => {
+      client
+        .db(dbName)
+        .collection(colName)
+        .find()
+        .toArray()
+        .then(users => {
+          const arrayFilter = users.filter(item => item.login.toLowerCase().includes(filter.toLowerCase()));
+          if(arrayFilter.length == 0) {
+            resolve(null)
+          } else {
+            resolve(arrayFilter)
+          }  
+        })
+        .catch(error => {reject(error)})
+    })
+  }
 }
 
 exports.default = Users;

@@ -36,9 +36,9 @@ class Messages {
       client
       .db(dbName)
       .collection("Messages")
-      .find({ login: login })
+      .find({ login: {$eq:login} })
       .toArray()
-      .then(messages => {resolve(messages)})
+      .then(user => {resolve(user)})
       .catch(error => {reject(error)});
     })
   }
@@ -100,6 +100,25 @@ class Messages {
         .catch(error => {reject(error)})
     })
   };
+
+  filterMessage(client, filter) {
+    return new Promise((resolve, reject) => {
+      client
+        .db(dbName)
+        .collection("Messages")
+        .find()
+        .toArray()
+        .then(messages => {
+          const arrayFilter = messages.filter(item => item.content.toLowerCase().includes(filter.toLowerCase()));
+          if(arrayFilter.length == 0) {
+            resolve(null)
+          } else {
+            resolve(arrayFilter)
+          }  
+        })
+        .catch(error => {reject(error)})
+    })
+  }
 
 }
 

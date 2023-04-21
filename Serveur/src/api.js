@@ -434,7 +434,7 @@ function init(db) {
       });
       return;
     }
-    if (await friends.getFriend(client, req.params.login, friend_login) == true) {
+    if (await friends.isFriend(client, req.params.login, friend_login)) {
       res.status(401).json({
         status: 401,
         message: "Déjà ami"
@@ -485,7 +485,7 @@ function init(db) {
   });
 
   router
-    .route("/user/:login/:friend_login")
+    .route("/user/:login/friends/:friend_login")
   //DELETE FRIEND
     .delete(async(req, res, next) => {
     if(!req.session.userid) {
@@ -495,7 +495,7 @@ function init(db) {
       });
       return;
     }
-    if (await friends.getFriend(client, req.params.login, req.params.friend_login) == false) {
+    if (!await friends.isFriend(client, req.params.login, req.params.friend_login)) {
       res.status(404).json({
         status: 404,
         message: "Ami non trouvé"
@@ -510,6 +510,71 @@ function init(db) {
           status: 500, 
           message: "Erreur interne",
           details: (e || "Erreur inconnue").toString()
+        })
+      })
+  })
+
+  //Verification si abonné a l'utilisateur
+    .get(async(req, res, next) => {
+    if(!req.session.userid) {
+      res.status(401).json({ 
+        status: 401, 
+        message: "Non connecté" 
+      });
+      return;
+    }
+    friends
+      .isFriend(client, req.params.login, req.params.friend_login)
+      .then(result => {
+        if(result){
+          res.status(201).send(true)
+        }else{
+          res.status(202).send(false)
+        }
+      })
+      .catch((e) => {
+        res.status(500).json({ 
+          status: 500, 
+          message: "Erreur interne",
+          details: (e || "Erreur inconnue").toString()
+        })
+      })
+    })
+
+  //BARRE DE RECHERCHE
+  
+  router.get("/recherche", async(req, res) => {
+    if(!req.session.userid) {
+      res.status(401).json({ 
+        status: 401, 
+        message: "Non connecté" 
+      });
+      return;
+    }
+    const { filter } = req.body;
+    messages
+      .filterMessage(client, filter)
+      .then(arrayMessages => {
+        users
+          .filterLogin(client, filter)
+          .then(arrayLogin => {
+            res.status(201).json({
+              status: 201,
+              messages: arrayMessages,
+              login: arrayLogin
+            })
+          })
+          .catch(error => {
+            res.status(500).json({
+              status: 500,
+              message: "Erreur interne"
+            })
+          })
+      })
+      .catch(error => {
+        res.status(500).json({
+          status: 500,
+          message: "Erreur interne"
         })
       })
   });

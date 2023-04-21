@@ -9,13 +9,10 @@ class Friends {
 
   create(client, login, friend_login){
     return new Promise((resolve, reject) => {
-        const newFriend = {
-            friend_login
-        }
         client
           .db(dbName)
           .collection(colName)
-          .updateOne({ login: {$eq: login} }, { $push: {friends: newFriend} })
+          .updateOne({ login: {$eq: login} }, { $push: {friends: friend_login} })
           .then(result => resolve("Nouvel ami ajouté"))
           .catch(err => {reject(err)})
     })
@@ -34,18 +31,18 @@ class Friends {
     }
 
   //Verifie si l'ami est présent dans la liste de l'utilisateur
-  getFriend(client, login, friend_login){
+  isFriend(client, login, friend_login){
       return new Promise((resolve, reject) => {
         client
           .db(dbName)
           .collection(colName)
           .findOne({ login: {$eq: login} })
           .then(user => {
-            const userfriend = user.friends.filter(item => item.friend_login.toLowerCase().includes(friend_login.toLowerCase()));
-            if(userfriend.length == 0) {
-              resolve(false)
+            const arrayFriend = user.friends.filter(item => item.toLowerCase() === (friend_login.toLowerCase()));
+            if(arrayFriend.length == 0) {
+              resolve(null)
             } else {
-              resolve(true)
+              resolve(arrayFriend)
             }  
           })
           .catch(err => {reject(err)})
@@ -57,7 +54,7 @@ class Friends {
       client
         .db(dbName)
         .collection(colName)
-        .updateOne({ login: {$eq: login} }, { $pull: {friends: {friend_login: {$eq: friend_login}}} })
+        .updateOne({ login: {$eq: login} }, { $pull: {friends: {$eq: friend_login}} })
         .then(result => {resolve("Ami supprimé")})
         .catch(error => {reject(error)})
     })
