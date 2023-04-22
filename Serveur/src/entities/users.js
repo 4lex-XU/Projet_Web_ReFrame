@@ -14,7 +14,8 @@ class Users {
         password,
         lastName,
         firstName,
-        friends: []
+        friends: [],
+        blackList: []
       };
       client
         .db(dbName)

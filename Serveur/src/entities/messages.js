@@ -16,6 +16,8 @@ class Messages {
           date,
           clock,
           content, 
+          hidden: false,
+          alert: 0,
           likes: {
             count: 0,
             login: []
@@ -50,17 +52,17 @@ class Messages {
         .collection('Messages')
         .find()
         .toArray()
-        .then(messages => {resolve(messages)})
+        .then(messages => {resolve(messages.filter(item => item.hidden == false && item.alert < 10))})
         .catch(error => {reject(error)});
     })
   }
 
-  delete(client, userId) {
+  delete(client, messageId) {
     return new Promise((resolve, reject) => {
       client
         .db(dbName)
         .collection("Messages")
-        .deleteOne({ _id: { $eq: new ObjectId(userId) } })
+        .deleteOne({ _id: { $eq: new ObjectId(messageId) } })
         .then((user) => {resolve("Suppression du message réussi")})
         .catch((error) => {reject(error)});
     });
@@ -77,24 +79,48 @@ class Messages {
     })
   }
 
-  like(client, login, login_mess) {
+  like(client, login, messageId) {
     return new Promise((resolve, reject) => {
       client
         .db(dbName)
-        .collection(colName)
+        .collection("Messages")
         .updateOne(
-          { "messages.login": {$eq: login_mess} },
-          { $push: { "messages.$.likes.login": login } },
+          { _id: { $eq: new ObjectId(messageId) } },
+          { $push: { "likes.login": login } },
         )
         .then(result => {
           client
             .db(dbName)
-            .collection(colName)
+            .collection("Messages")
             .updateOne(
-              { login: {$eq: login}, "messages.login": {$eq: login_mess} },
-              { $inc: { "messages.$.likes.count": 1 }}
+              { _id: { $eq: new ObjectId(messageId) } },
+              { $inc: { "likes.count": 1 }}
             )
             .then(result => {resolve("+1")})
+            .catch(error => {reject(error)})
+          })
+        .catch(error => {reject(error)})
+    })
+  };
+
+  dislike(client, login, messageId) {
+    return new Promise((resolve, reject) => {
+      client
+        .db(dbName)
+        .collection("Messages")
+        .updateOne(
+          { _id: { $eq: new ObjectId(messageId) } },
+          { $pull: { "likes.login": login } },
+        )
+        .then(result => {
+          client
+            .db(dbName)
+            .collection("Messages")
+            .updateOne(
+              { _id: { $eq: new ObjectId(messageId) } },
+              { $inc: { "likes.count": -1 }}
+            )
+            .then(result => {resolve("-1")})
             .catch(error => {reject(error)})
           })
         .catch(error => {reject(error)})
@@ -120,6 +146,16 @@ class Messages {
     })
   }
 
+  warning(client, messageId){
+    return new Promise((resolve,reject) => {
+      client
+        .db(dbName)
+        .collection("Messages")
+        .updateOne({ _id: { $eq: new ObjectId(messageId) } }, {$inc: {alert: 1}})
+        .then((user) => {resolve("Signalement réussi")})
+        .catch((error) => {reject(error)});
+    })
+  }
 }
 
 exports.default = Messages;

@@ -8,7 +8,7 @@ const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: 
 const Users = require("./entities/users.js");
 const Messages = require("./entities/messages.js");
 const Friends = require("./entities/friends.js");
-const e = require("express");
+const BlackList = require("./entities/blacklist.js");
 
 function init(db) {
   const router = express.Router();
@@ -25,6 +25,7 @@ function init(db) {
   const users = new Users.default(db);
   const messages = new Messages.default(db);
   const friends = new Friends.default(db);
+  const nofriends = new BlackList.default(db);
 
   // USERS
 
@@ -349,7 +350,7 @@ function init(db) {
   });
   
   // DELETE MESSAGE 
-  router.delete("/user/:userId/messages", async(req, res, next) => {
+  router.delete("/user/:MessageId/messages", async(req, res, next) => {
     if(!req.session.userid) {
       res.status(401).json({ 
         status: 401, 
@@ -358,7 +359,7 @@ function init(db) {
       return;
     }
     messages
-      .delete(client, req.params.userId)
+      .delete(client, req.params.MessageId)
       .then((result) => {res.status(201).send(result)})
       .catch((e) =>{
         if(e === "Message non trouvé"){
@@ -377,7 +378,7 @@ function init(db) {
   });
 
   //LIKER MESSAGE
-  router.post("/messages/like/:login/:login_mess", async(req, res) => {
+  router.post("/messages/like/:login/:MessageId", async(req, res) => {
     if(!req.session.userid) {
       res.status(401).json({ status: 401, message: "Non connecté" });
       return;
@@ -390,7 +391,50 @@ function init(db) {
       return;
     }
     messages
-      .like(client, req.params.login, req.params.login_mess)
+      .like(client, req.params.login, req.params.MessageId)
+      .then(result => {res.status(200).send(result)})
+      .catch(error => {
+        res.status(500).json({
+          status: 500,
+          message: "Erreur interne",
+          details: (error || "Erreur inconnue").toString()
+        })
+      })
+  });
+
+  //DISLIKE MESSAGE
+  router.post("/messages/dislike/:login/:MessageId", async(req, res) => {
+    if(!req.session.userid) {
+      res.status(401).json({ status: 401, message: "Non connecté" });
+      return;
+    }
+    if (!(await users.exists(client, req.params.login))) {
+      res.status(404).json({
+        status: 404,
+        message: "Utilisateur n'existe pas"
+      });
+      return;
+    }
+    messages
+      .dislike(client, req.params.login, req.params.MessageId)
+      .then(result => {res.status(200).send(result)})
+      .catch(error => {
+        res.status(500).json({
+          status: 500,
+          message: "Erreur interne",
+          details: (error || "Erreur inconnue").toString()
+        })
+      })
+  });
+
+  //WARNING
+  router.post("/messages/warning/:MessageId", async(req, res) => {
+    if(!req.session.userid) {
+      res.status(401).json({ status: 401, message: "Non connecté" });
+      return;
+    }
+    messages
+      .warning(client,req.params.MessageId)
       .then(result => {res.status(200).send(result)})
       .catch(error => {
         res.status(500).json({
@@ -584,6 +628,128 @@ function init(db) {
         })
       })
   });
+
+  //BLACKLIST
+
+  router
+    .route("/blacklist/:login")
+    //Ajoute l'utilisateur dans la liste noire
+    .put(async(req,res) => {
+      if(!req.session.userid) {
+        res.status(401).json({ 
+          status: 401, 
+          message: "Non connecté" 
+        });
+        return;
+      }
+      const { blackLogin } = req.body;
+      if (!blackLogin) {
+        res.status(400).json({
+          status: 400,
+          message: "Champs manquants"
+        });
+        return;
+      }
+      if (!(await users.exists(client, blackLogin))) {
+        res.status(404).json({
+          status: 404,
+          message: "Utilisateur introuvable"
+        });
+        return;
+      }
+      if (await nofriends.isBlack(client, req.params.login, blackLogin)) {
+        res.status(401).json({
+          status: 401,
+          message: "Déjà bloqué"
+        });
+        return;
+      }
+      nofriends
+        .create(client, req.params.login, blackLogin)
+        .then((result) => res.status(201).send(result))
+        .catch((e) =>
+          res.status(500).json({
+            status: 500,
+            message: "Erreur interne",
+            details: (e || "Erreur inconnue").toString()
+          })
+        )
+    })
+
+    //GET BLACKLIST -> retourne la liste noire d'un utilisateur
+    .get(async(req, res) => {
+      try {
+        if(!req.session.userid) {
+          res.status(401).json({ 
+            status: 401, 
+            message: "Non connecté" 
+          });
+          return;
+        }
+        if (!(await users.exists(client, req.params.login))) {
+          res.status(404).json({
+            status: 404,
+            message: "Utilisateur n'existe pas"
+          });
+          return;
+        }
+        const blacklist = await nofriends.get(client, req.params.login);
+        if(blacklist.length == 0) {
+          res.status(202).send("Aucun ami trouvé")
+        }
+        else res.status(200).json(blacklist)
+      } catch (e) {
+          res.status(500).json({ 
+            status: 500, 
+            message: "Erreur interne", 
+            details: (e || "Erreur inconnue").toString()
+          })
+      }
+    })
+
+    //DELETE Utilisateur de la liste noire
+    .delete(async(req, res, next) => {
+    if(!req.session.userid) {
+      res.status(401).json({ 
+        status: 401, 
+        message: "Non connecté" 
+      });
+      return;
+    }
+    const { blackLogin } = req.body;
+    if (!blackLogin) {
+      res.status(400).json({
+        status: 400,
+        message: "Champs manquants"
+      });
+      return;
+    }
+    if (!(await users.exists(client, blackLogin))) {
+      res.status(404).json({
+        status: 404,
+        message: "Utilisateur introuvable"
+      });
+      return;
+    }
+
+    if (!await nofriends.isBlack(client, req.params.login, blackLogin)) {
+      res.status(404).json({
+        status: 404,
+        message: "Utilisateur non bloqué"
+      });
+      return;
+    }
+    nofriends
+      .delete(client, req.params.login, blackLogin)
+      .then((result) => {res.status(201).send(result)})
+      .catch((e) => {
+        res.status(500).json({ 
+          status: 500, 
+          message: "Erreur interne",
+          details: (e || "Erreur inconnue").toString()
+        })
+      })
+  })
   
   return router;
 }
