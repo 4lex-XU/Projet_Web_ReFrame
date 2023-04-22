@@ -1,10 +1,10 @@
-import Logout from "./Logout";
-import ListeMessages from "./ListeMessages.js";
-import SaisieMessage from "./SaisieMessage";
-import BarreRecherche from "./BarreRecherche";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import ListeProfils from "./ListeProfils";
+import Logout from './Logout';
+import ListeMessages from './ListeMessages.js';
+import SaisieMessage from './SaisieMessage';
+import BarreRecherche from './BarreRecherche';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import ListeProfils from './ListeProfils';
 
 export default function HomePage(props) {
   const [saisir, setSaisir] = useState(false);
@@ -23,9 +23,18 @@ export default function HomePage(props) {
   };
 
   useEffect(() => {
-    axios.get(`/messages/getAll`)
+    axios
+      .get(`/messages/getAll/${props.myLogin}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
       .then((res) => {
-        setMessages(res.data.reverse());
+        if (res.data !== 'Aucun message trouvé') {
+          setMessages(res.data.reverse());
+        } else setMessages([]);
       })
       .catch((err) => {
         console.log(err);
@@ -38,36 +47,49 @@ export default function HomePage(props) {
         <a className="profilPage" href="a" onClick={pageProfilHandler}>
           Mon Profil
         </a>
-        <BarreRecherche setResultat={setResultatRecherche} setFaitRecherche={setFaitRecherche}/>
+        <BarreRecherche
+          setResultat={setResultatRecherche}
+          setFaitRecherche={setFaitRecherche}
+          faitRecherche={faitRecherche}
+        />
         <button id="saisie" onClick={handlerSaisie}>
-          NouvelFrame
+          Nouvelle Frame
         </button>
       </div>
-      {saisir && 
-      <SaisieMessage 
-        myLogin={props.myLogin} 
-        setRechargerMessages={setRechargerMessages}
-        rechargerMessages={rechargerMessages}
-      />}
+      {saisir && (
+        <SaisieMessage
+          myLogin={props.myLogin}
+          setRechargerMessages={setRechargerMessages}
+          rechargerMessages={rechargerMessages}
+        />
+      )}
       {faitRecherche ? (
         <div className="resultatRecherche">
           <h2>Résultat de la recherche</h2>
-          <ListeMessages 
-            messages={resultatRecherche.messages} 
+          <ListeMessages
+            messages={resultatRecherche.messages}
             setCurrentPage={props.setCurrentPage}
-          />          
-          <ListeProfils 
+            setMessages={setMessages}
+            setRechargerMessages={setRechargerMessages}
+            rechargerMessages={rechargerMessages}
+            myLogin={props.myLogin}
+          />
+          <ListeProfils
             profils={resultatRecherche.profils}
             setCurrentPage={props.setCurrentPage}
           />
         </div>
       ) : (
         <article className="listeMsg">
-          <ListeMessages 
-            messages={messages} 
+          <ListeMessages
+            messages={messages}
             setCurrentPage={props.setCurrentPage}
+            setMessages={setMessages}
+            setRechargerMessages={setRechargerMessages}
+            rechargerMessages={rechargerMessages}
+            myLogin={props.myLogin}
           />
-        </article>          
+        </article>
       )}
       <footer>
         <Logout setLogout={props.logout} />

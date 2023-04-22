@@ -12,6 +12,7 @@ export default function EditerProfil(props) {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [error, setError] = useState("");
   
   const getNewLogin = (evt) => {
     setNewLogin(evt.target.value);
@@ -30,12 +31,18 @@ export default function EditerProfil(props) {
   }
 
   useEffect(() => {
-    axios.get(`/user/${props.myLogin}`)
+    axios.get(`/user/${props.myLogin}`, {
+      headers: {
+        'Content-Type': 'application/json'
+        },
+        withCredentials: true,
+        credentials: 'include'
+        })
       .then((res) => {
-        setNewLogin(res.data.login);
-        setNewPassword(res.data.password);
-        setNewFirstName(res.data.firstName);
-        setNewLastName(res.data.lastName);
+        setFirstName(res.data.first_name);
+        setLastName(res.data.last_name);
+        setLogin(res.data.login);
+        setPassword(res.data.password);
       })
       .catch((err) => {
         console.log(err.response.data);
@@ -48,9 +55,11 @@ export default function EditerProfil(props) {
       const data = {
         login: newLogin,
         password: newPassword,
-        first_name: newFirstName,
-        last_name: newLastName
+        confirmpassword: newPasswordConfirm,
+        firstname: newFirstName,
+        lastname: newLastName
       };
+      console.log(data);
       axios.post(`/user/${props.myLogin}/edit`, data, {
         headers: {
           'Content-Type': 'application/json'
@@ -60,10 +69,16 @@ export default function EditerProfil(props) {
       })
         .then((res) => {
           console.log(res.data);
-          props.setRechargerProfil(true);
+          if(newLogin !== ""){
+            props.setMyLogin(newLogin);
+            props.setCurrentPage(newLogin);
+            return;
+          }
+          props.setCurrentPage(props.myLogin);
         })
         .catch((err) => {
           console.log(err.response.data);
+          setError(err.response.data);
         });
     }else{
       setPassOk(false);
@@ -72,24 +87,25 @@ export default function EditerProfil(props) {
 
   const pageProfilHandler = (evt) => {
     evt.preventDefault();
-    props.setCurrentPage("profil_page");
+    props.setCurrentPage(props.myLogin);
   }
 
   return (
     <div className="EditerProfil">
       <form onSubmit={Edit}>
         <label htmlFor="newLogin">New login</label>
-        <input type="text" id="newLogin" className="newLogin" onChange={getNewLogin} placeholder={newLogin}/>
+        <input type="text" id="newLogin" className="newLogin" onChange={getNewLogin} placeholder={login}/>
         <label htmlFor="newPassword">New password</label>
-        <input type="password" id="newPassword" className="newPassword" onChange={getNewPassword} />
+        <input type="password" id="newPassword" className="newPassword" onChange={getNewPassword} placeholder={password}/>
         <label htmlFor="newPasswordConfirm">Confirm new password</label>
-        <input type="password" id="newPasswordConfirm" className="newPasswordConfirm" onChange={getNewPasswordConfirm} />
-        {!PassOk && <p style={{color:red}}>Les mots de passe ne correspondent pas</p>}
+        <input type="password" id="newPasswordConfirm" className="newPasswordConfirm" onChange={getNewPasswordConfirm} placeholder={password}/>
         <label htmlFor="newFirstName">New firstname</label>
-        <input type="text" id="newFirstName" className="newFirstName" onChange={getNewFirstName} />
+        <input type="text" id="newFirstName" className="newFirstName" onChange={getNewFirstName} placeholder={firstName}/>
         <label htmlFor="newLastName">New lastname</label>
-        <input type="text" id="newLastName" className="newLastName" onChange={getNewLastName} />
+        <input type="text" id="newLastName" className="newLastName" onChange={getNewLastName} placeholder={lastName}/>
         <button type="submit">Valider</button>
+        {!PassOk && <p style={{color:'red'}}>Les mots de passe ne correspondent pas</p>}
+        {error && <p style={{color:'red'}}>{error.message}</p>}
         <a className="pageProfil" href="a" onClick={pageProfilHandler}>
           Retour
         </a>

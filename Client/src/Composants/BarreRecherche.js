@@ -44,6 +44,8 @@ export default function BarreRecherche(props) {
           onChange={handleInputChange}
         />
         <button type="submit">Rechercher</button>
+        {props.faitRecherche && 
+          <button onClick={() => props.setFaitRecherche(false)}>Annuler</button>}
         {erreur && <p style={{ color: "red", fontSize: "12px" }}>{erreur.message}</p>}
       </div>
     </form>
