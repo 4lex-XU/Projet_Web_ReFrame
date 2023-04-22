@@ -1,8 +1,5 @@
-const { error } = require("console");
 const { ObjectId } = require("mongodb");
-const { resolve } = require("path");
 const dbName = "base1"
-const colName = "Users"
 
 class Messages {
   constructor(db) {
@@ -16,13 +13,11 @@ class Messages {
           date,
           clock,
           content, 
-          hidden: false,
           alert: 0,
           likes: {
             count: 0,
             login: []
-          },
-          comment: []
+          }
       };
       client
         .db(dbName)
@@ -45,15 +40,24 @@ class Messages {
     })
   }
 
-  getAll(client) {
+  getAll(client, login) {
     return new Promise((resolve, reject) => {
       client
-        .db(dbName)
-        .collection('Messages')
-        .find()
-        .toArray()
-        .then(messages => {resolve(messages.filter(item => item.hidden == false && item.alert < 10))})
-        .catch(error => {reject(error)});
+      .db(dbName)
+      .collection("Users")
+      .findOne({ login: { $eq: login } })
+      .then(user => {
+        client
+          .db(dbName)
+          .collection("Messages")
+          .find({alert: {$lt: 10}})
+          .toArray()
+          .then(messages => {
+            resolve(messages.filter(message => !user.blackList.includes(message.login)))
+          })
+          .catch(error => {reject(error)})
+      })
+      .catch(error => {reject(error)})
     })
   }
 

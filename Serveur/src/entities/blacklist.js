@@ -13,14 +13,7 @@ class BlackList {
           .db(dbName)
           .collection(colName)
           .updateOne({ login: {$eq: login} }, { $push: {blackList: blackLogin} })
-          .then(result => {
-            client
-              .db(dbName)
-              .collection("Messages")
-              .updateMany({ login: {$eq: blackLogin} }, { $set: {hidden: true} })
-              .then(result => {resolve("Bloqué")})
-              .catch(error => {reject(error)})
-          })
+          .then(result => {resolve("Bloqué")})
           .catch(error => {reject(error)})
     })
   }
@@ -62,14 +55,7 @@ class BlackList {
         .db(dbName)
         .collection(colName)
         .updateOne({ login: {$eq: login} }, { $pull: {blackList: {$eq: blackLogin}} })
-        .then(result => {
-          client
-            .db(dbName)
-            .collection("Messages")
-            .updateMany({ login: {$eq: blackLogin} }, { $set: {hidden: false} })
-            .then(result => {resolve("Débloqué")})
-            .catch(error => {reject(error)})
-        })
+        .then(result => {resolve("Débloqué")})
         .catch(error => {reject(error)})
     })
   }

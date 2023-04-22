@@ -97,16 +97,16 @@ class Users {
   edit(client, oldlogin, login, password, lastName, firstName) {
     return new Promise((resolve, reject) => {
       const update = {}
-      if(login !== undefined) {
+      if(login !== "") {
         update["login"] = login
       }
-      if(password !== undefined) {
+      if(password !== "") {
         update["password"] = password
       }
-      if(lastName !== undefined) {
+      if(lastName !== "") {
         update["lastName"] = lastName
       }
-      if(firstName !== undefined) {
+      if(firstName !== "") {
         update["firstName"] = firstName
       }
       client
@@ -132,6 +132,31 @@ class Users {
           } else {
             resolve(arrayFilter)
           }  
+        })
+        .catch(error => {reject(error)})
+    })
+  }
+
+  statistique(client, login) {
+    return new Promise ((resolve, reject) => {
+      client
+        .db(dbName)
+        .collection(colName)
+        .findOne({login: {$eq: login}})
+        .then(user => {
+          client  
+            .db(dbName)
+            .collection("Messages")
+            .aggregate([
+              { $match: { login: { $in: user.friends } } },
+              { $group: { _id: "$login", messages: { $sum: 1 } } }
+            ])
+            .toArray()
+            .then(result => {
+              const dernier = result.sort()
+              resolve(dernier.pop()._id)
+            })
+            .catch(error => {reject(error)})
         })
         .catch(error => {reject(error)})
     })
