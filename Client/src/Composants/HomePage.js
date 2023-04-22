@@ -32,10 +32,6 @@ export default function HomePage(props) {
       });
   }, [rechargerMessages]);
 
-  const rechargerMessagesHandler = () => {
-    setRechargerMessages(!rechargerMessages);
-  };
-
   return (
     <div>
       <div className="headerHome">
@@ -46,11 +42,13 @@ export default function HomePage(props) {
         <button id="saisie" onClick={handlerSaisie}>
           NouvelFrame
         </button>
-        <button id="recharger" onClick={rechargerMessagesHandler}>
-          Recharger les messages
-        </button>
       </div>
-      {saisir && <SaisieMessage myLogin={props.myLogin}/>}
+      {saisir && 
+      <SaisieMessage 
+        myLogin={props.myLogin} 
+        setRechargerMessages={setRechargerMessages}
+        rechargerMessages={rechargerMessages}
+      />}
       {faitRecherche ? (
         <div className="resultatRecherche">
           <h2>Résultat de la recherche</h2>

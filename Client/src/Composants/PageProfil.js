@@ -43,10 +43,6 @@ export default function PageProfil(props) {
       });
   }, [rechargerMessages]);
 
-  const rechargerMessagesHandler = () => {
-    setRechargerMessages(!rechargerMessages);
-  };
-
   const Follow = (evt) => {
     evt.preventDefault();
     const data = {
@@ -89,7 +85,11 @@ export default function PageProfil(props) {
       );
   };
 
-  const handleEdit = () => <EditerProfil />;
+  const handleEdit = (evt) => {
+    evt.preventDefault();
+    props.setCurrentPage("edit_page");
+  };
+
   const homePageHandler = (evt) => {
     evt.preventDefault();
     props.setCurrentPage("home_page");
@@ -104,8 +104,8 @@ export default function PageProfil(props) {
       credentials: 'include'
     })
       .then((res) => {
+        props.logout();
         console.log(res.data);
-        props.setLogout();
       })
       .catch((err) => {
         console.log(err.response.data);
@@ -114,12 +114,12 @@ export default function PageProfil(props) {
 
   const getListAmis = () => {
   };
+
   return (
     <div className="profil">
       <div>{props.userProfil}</div>
       <button onClick={getListAmis}>Amis</button>
       
-
       {props.myLogin === props.userProfil ? (
         <div>
           <button onClick={handleEdit}>Editer le profil</button>
@@ -131,13 +131,9 @@ export default function PageProfil(props) {
         <button onClick={unFollow}>Ne plus suivre</button>
       )}
 
-
       <a className="homePage" href="a" onClick={homePageHandler}>
           Page d'accueil
       </a>
-      <button id="recharger" onClick={rechargerMessagesHandler}>
-        Recharger les messages
-      </button>
       <div>
         <ListeMessages 
           messages={messages} 

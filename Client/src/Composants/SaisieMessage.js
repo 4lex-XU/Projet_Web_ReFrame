@@ -30,6 +30,7 @@ export default function SaisieMessage(props) {
       .then((response) => {
         console.log(response.data);
         setContent("");
+        props.setRechargerMessages(!props.rechargerMessages);
       })
       .catch((error) => {
         console.log(error.response.data);

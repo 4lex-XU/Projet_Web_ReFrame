@@ -134,6 +134,13 @@ function init(db) {
   // GET USER -> retourne un seul utilisateur dont le login est passé dans l'url
     .get(async (req, res) => {
       try {
+        if(!req.session.userid) {
+          res.status(401).json({ 
+            status: 401, 
+            message: "Non connecté" 
+          });
+          return;
+        }
         const user = await users.get(client, req.params.login);
         if (!user) {
           res.status(404).json({
