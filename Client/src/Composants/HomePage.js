@@ -4,12 +4,14 @@ import SaisieMessage from "./SaisieMessage";
 import BarreRecherche from "./BarreRecherche";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import ListeProfils from "./ListeProfils";
 
 export default function HomePage(props) {
   const [saisir, setSaisir] = useState(false);
   const [messages, setMessages] = useState([]);
   const [rechargerMessages, setRechargerMessages] = useState(false);
   const [faitRecherche, setFaitRecherche] = useState(false);
+  const [resultatRecherche, setResultatRecherche] = useState(null);
 
   const handlerSaisie = (evt) => {
     if (saisir) setSaisir(false);
@@ -40,7 +42,7 @@ export default function HomePage(props) {
         <a className="profilPage" href="a" onClick={pageProfilHandler}>
           Mon Profil
         </a>
-        <BarreRecherche />
+        <BarreRecherche setResultat={setResultatRecherche} setFaitRecherche={setFaitRecherche}/>
         <button id="saisie" onClick={handlerSaisie}>
           NouvelFrame
         </button>
@@ -52,8 +54,16 @@ export default function HomePage(props) {
       {faitRecherche ? (
         <div className="resultatRecherche">
           <h2>Résultat de la recherche</h2>
-        Z</div>
-          ) : (
+          <ListeMessages 
+            messages={resultatRecherche.messages} 
+            setCurrentPage={props.setCurrentPage}
+          />          
+          <ListeProfils 
+            profils={resultatRecherche.profils}
+            setCurrentPage={props.setCurrentPage}
+          />
+        </div>
+      ) : (
         <article className="listeMsg">
           <ListeMessages 
             messages={messages} 

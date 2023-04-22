@@ -10,8 +10,20 @@ export default function PageProfil(props) {
   const [rechargerMessages, setRechargerMessages] = useState(false);
 
   useEffect(() => {
-    axios.get
-  })
+    axios.get(`/user/${props.myLogin}/friends/${props.userProfil}`, {
+      headers: {
+        'Content-Type': 'application/json'
+        },
+        withCredentials: true,
+        credentials: 'include'
+        })
+      .then((res) => {
+        setIsAbonne(res.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, [isAbonne]);
 
   useEffect(() => {
     axios.get(`/user/${props.userProfil}/messages`, {
@@ -22,7 +34,9 @@ export default function PageProfil(props) {
       credentials: 'include'
     })
       .then((res) => {
-        setMessages(res.data.reverse());
+        if(res.data !== "Aucun message trouvé"){
+          setMessages(res.data.reverse());
+        }
       })
       .catch((err) => {
         console.log(err.response.data);
@@ -57,7 +71,7 @@ export default function PageProfil(props) {
   const unFollow = (evt) => {
     evt.preventDefault();
     axios
-      .delete(`/user/${props.myLogin}/${props.userProfil}`, {
+      .delete(`/user/${props.myLogin}/friends/${props.userProfil}`, {
         headers: {
           'Content-Type': 'application/json'
         },

@@ -4,7 +4,7 @@ export default function ListeMessages(props) {
   const messages = props.messages;
   return (
     <div className="listeMsg">
-      {messages.map((message, index) => (
+      {messages && messages.map((message, index) => (
         <Message
           key={index}
           login={message.login}

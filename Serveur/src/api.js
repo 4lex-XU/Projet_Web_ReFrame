@@ -256,7 +256,6 @@ function init(db) {
 
   // CREATE MESSAGE
   router.put("/user/newMessage", async(req, res) => {
-    console.log(req.session.login)
     if(!req.session.userid) {
       res.status(401).json({ 
         status: 401, 
@@ -543,15 +542,22 @@ function init(db) {
 
   //BARRE DE RECHERCHE
   
-  router.get("/recherche", async(req, res) => {
+  router.get("/recherche", async (req, res, next) => {
     if(!req.session.userid) {
       res.status(401).json({ 
         status: 401, 
         message: "Non connecté" 
       });
       return;
+    } 
+    const { filter } = req.query;
+      if (!filter) {
+      res.status(400).json({
+        status: 400,
+        message: "Champs manquants"
+      });
+      return;
     }
-    const { filter } = req.body;
     messages
       .filterMessage(client, filter)
       .then(arrayMessages => {
@@ -561,7 +567,7 @@ function init(db) {
             res.status(201).json({
               status: 201,
               messages: arrayMessages,
-              login: arrayLogin
+              profils: arrayLogin
             })
           })
           .catch(error => {

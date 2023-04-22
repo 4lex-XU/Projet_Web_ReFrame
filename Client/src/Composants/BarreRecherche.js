@@ -3,36 +3,37 @@ import React, { useState } from "react";
 
 export default function BarreRecherche(props) {
   const [recherche, setRecherche] = useState("");
-  const [resultats, setResultats] = useState([]);
   const [erreur, setErreur] = useState(null);
 
   function handleInputChange(evt) {
-    setRecherche(evt.target.value);
+    setRecherche(evt.target.value)
   }
 
   function handleSubmit(evt) {
     evt.preventDefault();
+    setErreur(null);
     const data = {
       filter: recherche
-    }
-    axios.get(`/recherche`, recherche, {
+    };
+    axios.get("/recherche", {
       headers: {
         'Content-Type': 'application/json'
       },
+      params: data,
       withCredentials: true,
-      credentials: 'include'
+      credentials: 'same-origin'
     })
-      .then((res) => {
-        console.log(res.data);
-        setResultats(res.data);
-        
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        setErreur(err.response.data);
-      });
-  }
-
+    .then((res) => {
+      console.log(res.data);
+      props.setResultat(res.data);
+      props.setFaitRecherche(true);
+    })
+    .catch((err) => {
+      console.log(err.response.data);
+      setErreur(err.response.data);
+    });
+  };
+  
   return (
     <form className="barreRecherche" onSubmit={handleSubmit}>
       <div>
