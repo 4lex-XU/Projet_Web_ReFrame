@@ -5,8 +5,9 @@ export default function ListeMessages(props) {
   return (
     <div className="listeMsg">
       {messages &&
-        messages.map((message) => (
+        messages.map((message, index) => (
           <Message
+            key={index}
             id={message._id}
             login={message.login}
             content={message.content}
@@ -18,6 +19,7 @@ export default function ListeMessages(props) {
             rechargerMessages={props.rechargerMessages}
             setRechargerMessages={props.setRechargerMessages}
             myLogin={props.myLogin}
+            nbLikes={message.likes.count}
           />
         ))}
     </div>

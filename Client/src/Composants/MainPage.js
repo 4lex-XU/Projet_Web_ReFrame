@@ -2,6 +2,7 @@ import { useState } from 'react';
 import '../CSS/styles.css';
 import '../CSS/formulaire.css';
 import '../CSS/message.css';
+import logo from '../Images/Logo-ReFrame.png';
 
 import NavigationPanel from './NavigationPanel.js';
 
@@ -36,8 +37,8 @@ export default function MainPage(props) {
   return (
     <div>
       <header className="reframe">
-        <a className="reframe" href="a" onClick={handler}>
-          <h1>ReFrame</h1>
+        <a className="logo" href="a" onClick={handler}>
+          <img src={logo} style={{ width: '50%' }} />
         </a>
       </header>
       <main>

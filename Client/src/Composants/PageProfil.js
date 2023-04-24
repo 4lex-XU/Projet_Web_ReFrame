@@ -3,6 +3,8 @@ import ListeMessages from './ListeMessages';
 import ListeProfils from './ListeProfils';
 import Logout from './Logout';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome } from '@fortawesome/free-solid-svg-icons';
 
 export default function PageProfil(props) {
   const [isAbonne, setIsAbonne] = useState(null);
@@ -10,6 +12,27 @@ export default function PageProfil(props) {
   const [afficherAmis, setAfficherAmis] = useState(false);
   const [amis, setAmis] = useState([]);
   const [rechargerMessages, setRechargerMessages] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  useEffect(() => {
+    axios
+      .get(`/user/${props.userProfil}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        setFirstName(res.data.firstName);
+        setLastName(res.data.lastName);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, []);
 
   useEffect(() => {
     axios
@@ -137,25 +160,41 @@ export default function PageProfil(props) {
     }
   };
 
+  const bloquer = (evt) => {
+    evt.preventDefault();
+  };
+
   return (
     <div className="profil">
-      <div>{props.userProfil}</div>
-      <button onClick={getListAmis}>Amis</button>
+      <div className="headerHome">
+        <button onClick={homePageHandler}>
+          <FontAwesomeIcon icon={faHome} size="3x" />
+        </button>
+        <h3 className="prenom-nom">
+          {firstName} {lastName}{' '}
+          <span className="tag">@{props.userProfil}</span>
+        </h3>
+        {props.myLogin === props.userProfil ? (
+          <div className="headerHome">
+            <button onClick={getListAmis}>Amis</button>
+            <button onClick={handleEdit}>Editer le profil</button>
+            <button onClick={handleDelete}>Supprimer mon compte</button>
+          </div>
+        ) : isAbonne === false ? (
+          <div className="headerHome">
+            <button onClick={getListAmis}>Amis</button>
+            <button onClick={Follow}>Suivre</button>
+            <button onClick={Follow}>Bloquer</button>
+          </div>
+        ) : (
+          <div className="headerHome">
+            <button onClick={getListAmis}>Amis</button>
+            <button onClick={unFollow}>Ne plus suivre</button>
+            <button onClick={Follow}>Bloquer</button>
+          </div>
+        )}
+      </div>
 
-      {props.myLogin === props.userProfil ? (
-        <div>
-          <button onClick={handleEdit}>Editer le profil</button>
-          <button onClick={handleDelete}>Supprimer mon compte</button>
-        </div>
-      ) : isAbonne === false ? (
-        <button onClick={Follow}>Suivre</button>
-      ) : (
-        <button onClick={unFollow}>Ne plus suivre</button>
-      )}
-
-      <a className="homePage" href="a" onClick={homePageHandler}>
-        Page d'accueil
-      </a>
       {afficherAmis && (
         <div>
           <h2>Amis</h2>

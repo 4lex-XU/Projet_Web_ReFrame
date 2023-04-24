@@ -3,7 +3,7 @@ export default function ListeProfils(props) {
     <div>
       {props.profils &&
         props.profils.map((profil, index) => (
-          <div>
+          <div key={index}>
             <a
               href="a"
               onClick={(evt) => {

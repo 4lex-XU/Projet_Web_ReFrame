@@ -1,39 +1,40 @@
-import axios from "axios";
-import React, { useState } from "react";
+import axios from 'axios';
+import React, { useState } from 'react';
 
 export default function BarreRecherche(props) {
-  const [recherche, setRecherche] = useState("");
+  const [recherche, setRecherche] = useState('');
   const [erreur, setErreur] = useState(null);
 
   function handleInputChange(evt) {
-    setRecherche(evt.target.value)
+    setRecherche(evt.target.value);
   }
 
   function handleSubmit(evt) {
     evt.preventDefault();
     setErreur(null);
     const data = {
-      filter: recherche
+      filter: recherche,
     };
-    axios.get("/recherche", {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      params: data,
-      withCredentials: true,
-      credentials: 'same-origin'
-    })
-    .then((res) => {
-      console.log(res.data);
-      props.setResultat(res.data);
-      props.setFaitRecherche(true);
-    })
-    .catch((err) => {
-      console.log(err.response.data);
-      setErreur(err.response.data);
-    });
-  };
-  
+    axios
+      .get('/recherche', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        params: data,
+        withCredentials: true,
+        credentials: 'same-origin',
+      })
+      .then((res) => {
+        console.log(res.data);
+        props.setResultat(res.data);
+        props.setFaitRecherche(true);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        setErreur(err.response.data);
+      });
+  }
+
   return (
     <form className="barreRecherche" onSubmit={handleSubmit}>
       <div>
@@ -44,9 +45,19 @@ export default function BarreRecherche(props) {
           onChange={handleInputChange}
         />
         <button type="submit">Rechercher</button>
-        {props.faitRecherche && 
-          <button onClick={() => props.setFaitRecherche(false)}>Annuler</button>}
-        {erreur && <p style={{ color: "red", fontSize: "12px" }}>{erreur.message}</p>}
+        {props.faitRecherche && (
+          <button
+            onClick={() => {
+              props.setFaitRecherche(false);
+              setRecherche('');
+            }}
+          >
+            Annuler
+          </button>
+        )}
+        {erreur && (
+          <p style={{ color: 'red', fontSize: '12px' }}>{erreur.message}</p>
+        )}
       </div>
     </form>
   );

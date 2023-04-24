@@ -1,13 +1,16 @@
 .mainpage {
   font-family: sans-serif;
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.068);
+  background-color: rgb(255, 255, 255);
   min-width: 400px;
 }
 
 .reframe {
   padding: 1px;
   background-color: rgb(133, 147, 207);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 header {
@@ -24,4 +27,19 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+.prenom-nom {
+  font-size: 25px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tag {
+  font-size: 16px;
+  color: gray;
+  margin-left: 10px;
 }

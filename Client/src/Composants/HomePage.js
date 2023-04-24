@@ -5,6 +5,8 @@ import BarreRecherche from './BarreRecherche';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ListeProfils from './ListeProfils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function HomePage(props) {
   const [saisir, setSaisir] = useState(false);
@@ -44,9 +46,10 @@ export default function HomePage(props) {
   return (
     <div>
       <div className="headerHome">
-        <a className="profilPage" href="a" onClick={pageProfilHandler}>
-          Mon Profil
-        </a>
+        <button onClick={pageProfilHandler}>
+          <FontAwesomeIcon icon={faUserCircle} size="3x" />
+          Profil
+        </button>
         <BarreRecherche
           setResultat={setResultatRecherche}
           setFaitRecherche={setFaitRecherche}

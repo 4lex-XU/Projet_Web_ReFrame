@@ -1,6 +1,6 @@
-const { ObjectId } = require("mongodb");
-const dbName = "base1"
-const colName = "Users"
+const { ObjectId } = require('mongodb');
+const dbName = 'base1';
+const colName = 'Users';
 
 class Users {
   constructor(db) {
@@ -15,14 +15,18 @@ class Users {
         lastName,
         firstName,
         friends: [],
-        blackList: []
+        blackList: [],
       };
       client
         .db(dbName)
         .collection(colName)
         .insertOne(newUser)
-        .then((result) => {resolve(result.insertedId)})
-        .catch((error) => {reject(error)})
+        .then((result) => {
+          resolve(result.insertedId);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -33,10 +37,14 @@ class Users {
         .db(dbName)
         .collection(colName)
         .findOne({ login: { $eq: login } })
-        .then((user) => {resolve(user)})
-        .catch((error) => {reject(error)});
+        .then((user) => {
+          resolve(user);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
-  } 
+  }
 
   //Verifie si l'utilisateur existe dans la base de donnée et le renvoie
   async exists(client, login) {
@@ -52,7 +60,9 @@ class Users {
             resolve(null);
           }
         })
-        .catch((error) => {reject(error)});
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -64,7 +74,7 @@ class Users {
         .collection(colName)
         .findOne({
           login: { $eq: login },
-          password: { $eq: password }
+          password: { $eq: password },
         })
         .then((user) => {
           if (user) {
@@ -73,7 +83,9 @@ class Users {
             resolve(null);
           }
         })
-        .catch((err) => {reject(err)});
+        .catch((err) => {
+          reject(err);
+        });
     });
   }
 
@@ -90,31 +102,57 @@ class Users {
             resolve(null);
           }
         })
-        .catch((error) => {reject(error)});
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
-  
+
   edit(client, oldlogin, login, password, lastName, firstName) {
     return new Promise((resolve, reject) => {
-      const update = {}
-      if(login !== "") {
-        update["login"] = login
+      const update = {};
+      if (login !== '') {
+        update['login'] = login;
       }
-      if(password !== "") {
-        update["password"] = password
+      if (password !== '') {
+        update['password'] = password;
       }
-      if(lastName !== "") {
-        update["lastName"] = lastName
+      if (lastName !== '') {
+        update['lastName'] = lastName;
       }
-      if(firstName !== "") {
-        update["firstName"] = firstName
+      if (firstName !== '') {
+        update['firstName'] = firstName;
       }
       client
         .db(dbName)
         .collection(colName)
-        .updateOne({ login: {$eq: oldlogin} }, { $set: update})
-        .then(newUser => resolve(newUser))
-        .catch(err => reject(err))
+        .updateOne({ login: { $eq: oldlogin } }, { $set: update })
+        .then((newUser) => {
+          if (login !== '') {
+            client
+              .db(dbName)
+              .collection('Messages')
+              .updateMany(
+                { login: { $eq: oldlogin } },
+                { $set: { login: login } }
+              )
+              .then((newUser) => {
+                client
+                  .db(dbName)
+                  .collection('Comments')
+                  .updateMany(
+                    { login: { $eq: oldlogin } },
+                    { $set: { login: login } }
+                  )
+                  .then((newUser) => resolve(newUser))
+                  .catch((error) => reject(error));
+              })
+              .catch((error) => reject(error));
+          } else {
+            resolve(newUser);
+          }
+        })
+        .catch((error) => reject(error));
     });
   }
 
@@ -125,41 +163,49 @@ class Users {
         .collection(colName)
         .find()
         .toArray()
-        .then(users => {
-          const arrayFilter = users.filter(item => item.login.toLowerCase().includes(filter.toLowerCase()));
-          if(arrayFilter.length == 0) {
-            resolve(null)
+        .then((users) => {
+          const arrayFilter = users.filter((item) =>
+            item.login.toLowerCase().includes(filter.toLowerCase())
+          );
+          if (arrayFilter.length == 0) {
+            resolve(null);
           } else {
-            resolve(arrayFilter)
-          }  
+            resolve(arrayFilter);
+          }
         })
-        .catch(error => {reject(error)})
-    })
+        .catch((error) => {
+          reject(error);
+        });
+    });
   }
 
   statistique(client, login) {
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       client
         .db(dbName)
         .collection(colName)
-        .findOne({login: {$eq: login}})
-        .then(user => {
-          client  
+        .findOne({ login: { $eq: login } })
+        .then((user) => {
+          client
             .db(dbName)
-            .collection("Messages")
+            .collection('Messages')
             .aggregate([
               { $match: { login: { $in: user.friends } } },
-              { $group: { _id: "$login", messages: { $sum: 1 } } }
+              { $group: { _id: '$login', messages: { $sum: 1 } } },
             ])
             .toArray()
-            .then(result => {
-              const dernier = result.sort()
-              resolve(dernier.pop()._id)
+            .then((result) => {
+              const dernier = result.sort();
+              resolve(dernier.pop()._id);
             })
-            .catch(error => {reject(error)})
+            .catch((error) => {
+              reject(error);
+            });
         })
-        .catch(error => {reject(error)})
-    })
+        .catch((error) => {
+          reject(error);
+        });
+    });
   }
 }
 

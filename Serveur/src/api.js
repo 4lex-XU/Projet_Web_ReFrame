@@ -13,7 +13,6 @@ const Users = require('./entities/users.js');
 const Messages = require('./entities/messages.js');
 const Friends = require('./entities/friends.js');
 const BlackList = require('./entities/blacklist.js');
-const Comments = require('./entities/comments.js');
 
 function init(db) {
   const router = express.Router();
@@ -31,7 +30,6 @@ function init(db) {
   const messages = new Messages.default(db);
   const friends = new Friends.default(db);
   const nofriends = new BlackList.default(db);
-  const comments = new Comments.default(db);
 
   // USERS
 
@@ -140,13 +138,6 @@ function init(db) {
     // GET USER -> retourne un seul utilisateur dont le login est passé dans l'url
     .get(async (req, res) => {
       try {
-        if (!req.session.userid) {
-          res.status(401).json({
-            status: 401,
-            message: 'Non connecté',
-          });
-          return;
-        }
         const user = await users.get(client, req.params.login);
         if (!user) {
           res.status(404).json({
@@ -377,13 +368,6 @@ function init(db) {
   // GET ALL MESSAGES -> retourne la liste de message de tous les utilisateurs
   router.get('/messages/getAll/:login', async (req, res) => {
     try {
-      if (!req.session.userid) {
-        res.status(401).json({
-          status: 401,
-          message: 'Non connecté',
-        });
-        return;
-      }
       const mess = await messages.getAll(client, req.params.login);
       if (mess.length == 0) {
         res.status(202).send('Aucun message trouvé');
@@ -483,16 +467,52 @@ function init(db) {
       });
   });
 
+  //Renvoie true si le user est present dans la liste de like sinon false
+  router.get('/message/:login/:messageId', async (req, res) => {
+    try {
+      messages
+        .getUserLike(client, req.query.login, req.query.messageId)
+        .then((result) => res.status(201).send(result))
+        .catch((e) => {
+          res.status(500).json({
+            status: 500,
+            message: 'Erreur interne',
+            details: (e || 'Erreur inconnue').toString(),
+          });
+        });
+    } catch (e) {
+      res.status(500).json({
+        status: 500,
+        message: 'Erreur interne',
+        details: (e || 'Erreur inconnue').toString(),
+      });
+    }
+  });
+
+  //Renvoie le nombre de like
+  router.get('/message/nblike', async (req, res) => {
+    messages
+      .getLike(client, req.query.MessageId)
+      .then((result) => res.status(201).send(result))
+      .catch((e) => {
+        res.status(500).json({
+          status: 500,
+          message: 'Erreur interne',
+          details: (e || 'Erreur inconnue').toString(),
+        });
+      });
+  });
+
   //WARNING
-  router.post('/messages/warning/:MessageId', async (req, res) => {
+  router.post('/messages/warning/:MessageId/:login', async (req, res) => {
     if (!req.session.userid) {
       res.status(401).json({ status: 401, message: 'Non connecté' });
       return;
     }
     messages
-      .warning(client, req.params.MessageId)
+      .warning(client, req.params.MessageId, req.params.login)
       .then((result) => {
-        res.status(200).send(result);
+        res.status(201).send(result);
       })
       .catch((error) => {
         res.status(500).json({
@@ -817,9 +837,8 @@ function init(db) {
         });
     });
 
-  //COMMENTAIRES
-
-  router.put('/newComment', async (req, res) => {
+  //Verification si utilisateur bloqué
+  router.get('/blacklist/:login/:blacklogin', async (req, res, next) => {
     if (!req.session.userid) {
       res.status(401).json({
         status: 401,
@@ -827,45 +846,21 @@ function init(db) {
       });
       return;
     }
-    const { messageId, date, clock, content } = req.body;
-    if (!messageId || !date || !clock) {
-      res.status(400).json({
-        status: 400,
-        message: 'Champs manquants',
+    if (!(await users.exists(client, req.params.blacklogin))) {
+      res.status(404).json({
+        status: 404,
+        message: 'Utilisateur introuvable',
       });
       return;
     }
-    if (!content) {
-      res.status(400).json({
-        status: 400,
-        message: 'Message vide',
-      });
-      return;
-    }
-    comments
-      .create(client, messageId, date, clock, content)
-      .then((result) => res.status(200).send(result))
-      .catch((e) =>
-        res.status(500).json({
-          status: 500,
-          message: 'Erreur interne',
-          details: (e || 'Erreur inconnue').toString(),
-        })
-      );
-  });
-
-  router.delete('/comment/:commentId', async (req, res, next) => {
-    if (!req.session.userid) {
-      res.status(401).json({
-        status: 401,
-        message: 'Non connecté',
-      });
-      return;
-    }
-    comments
-      .delete(client, req.params.commentId)
+    nofriends
+      .isBlack(client, req.params.login, req.params.blacklogin)
       .then((result) => {
-        res.status(201).send(result);
+        if (result) {
+          res.status(201).send(true);
+        } else {
+          res.status(202).send(false);
+        }
       })
       .catch((e) => {
         res.status(500).json({
@@ -876,7 +871,46 @@ function init(db) {
       });
   });
 
-  router.get('/comment/:messageId', async (req, res) => {
+  //COMMENTAIRES
+
+  //CREATION COMMENTAIRE
+  router.put('/newComment', async (req, res) => {
+    if (!req.session.userid) {
+      res.status(401).json({
+        status: 401,
+        message: 'Non connecté',
+      });
+      return;
+    }
+    const { parentId, login, date, clock, content } = req.body;
+    if (!parentId || !login || !date || !clock) {
+      res.status(400).json({
+        status: 400,
+        message: 'Champs manquants',
+      });
+      return;
+    }
+    if (!content) {
+      res.status(400).json({
+        status: 400,
+        message: 'Commentaire vide',
+      });
+      return;
+    }
+    messages
+      .createComment(client, parentId, login, date, clock, content)
+      .then((result) => res.status(200).send(result))
+      .catch((e) =>
+        res.status(500).json({
+          status: 500,
+          message: 'Erreur interne',
+          details: (e || 'Erreur inconnue').toString(),
+        })
+      );
+  });
+
+  //Affiche les commentaires d'un message dont l'id est passé dans l'url
+  router.get('/comment/:parentId', async (req, res) => {
     try {
       if (!req.session.userid) {
         res.status(401).json({
@@ -885,8 +919,39 @@ function init(db) {
         });
         return;
       }
-      comments
-        .printComments(client, req.params.messageId)
+      messages
+        .getComments(client, req.params.parentId)
+        .then((result) => {
+          res.status(201).send(result);
+        })
+        .catch((e) => {
+          res.status(500).json({
+            status: 500,
+            message: 'Erreur interne',
+            details: (e || 'Erreur inconnue').toString(),
+          });
+        });
+    } catch (e) {
+      res.status(500).json({
+        status: 500,
+        message: 'Erreur interne',
+        details: (e || 'Erreur inconnue').toString(),
+      });
+    }
+  });
+
+  //donne le nombre de commentaires d'un message dont l'id est passé dans l'url
+  router.get('/message/nbcomment', async (req, res) => {
+    try {
+      if (!req.session.userid) {
+        res.status(401).json({
+          status: 401,
+          message: 'Non connecté',
+        });
+        return;
+      }
+      messages
+        .getNbComments(client, req.query.parentId)
         .then((result) => {
           res.status(201).send(result);
         })
