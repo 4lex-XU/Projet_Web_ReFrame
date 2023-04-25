@@ -24,6 +24,7 @@ export default function Message(props) {
   const [rechargerCommentaires, setRechargerCommentaires] = useState(false);
   const [afficherCommentaires, setAfficherCommentaires] = useState(false);
   const [commentaires, setCommentaires] = useState([]);
+  const [isAbonne, setIsAbonne] = useState(null);
 
   // PERMET DE CHANGER DE PAGE
   const pageProfilHandler = (evt) => {
@@ -233,6 +234,67 @@ export default function Message(props) {
       });
   }, [rechargerCommentaires, afficherCommentaires]);
 
+  // Au chargement de la page, on détermine si l'utilisateur est abonné au profil
+  useEffect(() => {
+    axios
+      .get(`/user/${props.myLogin}/friends/${props.login}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        setIsAbonne(res.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, [isAbonne, props.login]);
+
+  // Permet de suivre un profil
+  const Follow = (evt) => {
+    evt.preventDefault();
+    const data = {
+      friend_login: props.login,
+    };
+    axios
+      .put(`/user/${props.myLogin}/newfriend`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsAbonne(true);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  };
+
+  // Permet de ne plus suivre un profil
+  const unFollow = (evt) => {
+    evt.preventDefault();
+    axios
+      .delete(`/user/${props.myLogin}/friends/${props.login}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsAbonne(false);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  };
+
   return (
     <article className="message">
       <div>
@@ -255,7 +317,11 @@ export default function Message(props) {
                 <button onClick={warning}>
                   <FontAwesomeIcon icon={faFlag} />
                 </button>
-                <button>Suivre/Ne plus suivre</button>
+                {isAbonne === false ? (
+                  <button onClick={Follow}>Suivre</button>
+                ) : (
+                  <button onClick={unFollow}>Ne plus suivre</button>
+                )}
               </div>
             )}
           </div>

@@ -1,13 +1,13 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState } from 'react';
+import axios from 'axios';
 
 export default function Signin(props) {
-  const [login, setLogin] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [login, setLogin] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [passOK, setPassOK] = useState(false);
-  const [pass, setPass] = useState("");
-  const [passVerif, setPassVerif] = useState("");
+  const [pass, setPass] = useState('');
+  const [passVerif, setPassVerif] = useState('');
   const [error, setError] = useState(null);
 
   const getLogin = (evt) => {
@@ -29,23 +29,23 @@ export default function Signin(props) {
     if (pass === passVerif) setPassOK(false);
     else setPassOK(true);
     evt.preventDefault();
-    setError(null)
-    if(!passOK) {
+    setError(null);
+    if (!passOK) {
       const data = {
-        login:login,
-        password:pass,
-        lastname:lastName,
-        firstname:firstName
+        login: login,
+        password: pass,
+        lastname: lastName,
+        firstname: firstName,
       };
-      console.log(data)
+      console.log(data);
       axios
-        .put("/user", data)
+        .put('/user', data)
         .then((response) => {
           console.log(response.data);
-          props.setCurrentPage("login_page");
+          props.setCurrentPage('login_page');
         })
         .catch((error) => {
-          console.log(error.response.data)
+          console.log(error.response.data);
           setError(error.response.data);
         });
     }
@@ -53,7 +53,7 @@ export default function Signin(props) {
 
   const loginHandler = (evt) => {
     evt.preventDefault();
-    props.setCurrentPage("login_page");
+    props.setCurrentPage('login_page');
   };
 
   return (
@@ -69,8 +69,14 @@ export default function Signin(props) {
         <input type="password" id="signin_mdp1" onChange={getPass} />
         <label htmlFor="signin_mdp2">Password (2)</label>
         <input type="password" id="signin_mdp2" onChange={getPassVerif} />
-        {passOK && <p style={{ color: "red" }}>Veuillez reconfirmer le mot de passe</p>}
-        {error && <p style={{ color: "red" }}>{error.message} {error.detail}</p>}
+        {passOK && (
+          <p style={{ color: 'red' }}>Veuillez reconfirmer le mot de passe</p>
+        )}
+        {error && (
+          <p style={{ color: 'red' }}>
+            {error.message} {error.detail}
+          </p>
+        )}
         <div className="signin-input">
           <button onClick={submissionHandler}>Sign In</button>
           <button type="reset">Reset</button>

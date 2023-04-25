@@ -14,7 +14,15 @@ export default function PageProfil(props) {
   const [rechargerMessages, setRechargerMessages] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [naissance, setNaissance] = useState('');
+  const [description, setDescription] = useState('');
+  const [ville, setVille] = useState('');
+  const [amiStar, setAmiStar] = useState(null);
+  const [isBlocked, setIsBlocked] = useState(null);
+  const [afficherBlacklist, setAfficherBlacklist] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState([]);
 
+  // Lors de l'ouverture de la page, on récupère les informations du profil
   useEffect(() => {
     axios
       .get(`/user/${props.userProfil}`, {
@@ -27,13 +35,16 @@ export default function PageProfil(props) {
       .then((res) => {
         setFirstName(res.data.firstName);
         setLastName(res.data.lastName);
-        console.log(res.data);
+        setNaissance(res.data.naissance);
+        setDescription(res.data.description);
+        setVille(res.data.ville);
       })
       .catch((err) => {
         console.log(err.response.data);
       });
-  }, []);
+  }, [props.userProfil]);
 
+  // Au chargement de la page, on détermine si l'utilisateur est abonné au profil
   useEffect(() => {
     axios
       .get(`/user/${props.myLogin}/friends/${props.userProfil}`, {
@@ -49,8 +60,27 @@ export default function PageProfil(props) {
       .catch((err) => {
         console.log(err.response.data);
       });
-  }, [isAbonne]);
+  }, [isAbonne, props.userProfil]);
 
+  // Au chargement de la page, on détermine si l'utilisateur est bloqué par le profil
+  useEffect(() => {
+    axios
+      .get(`/blacklist/${props.myLogin}/${props.userProfil}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        setIsBlocked(res.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, [isBlocked, props.userProfil]);
+
+  // Au chargement de la page, on récupère les messages du profil
   useEffect(() => {
     axios
       .get(`/user/${props.userProfil}/messages`, {
@@ -68,8 +98,9 @@ export default function PageProfil(props) {
       .catch((err) => {
         console.log(err.response.data);
       });
-  }, [rechargerMessages]);
+  }, [rechargerMessages, props.userProfil]);
 
+  // Permet de suivre un profil
   const Follow = (evt) => {
     evt.preventDefault();
     const data = {
@@ -92,6 +123,7 @@ export default function PageProfil(props) {
       });
   };
 
+  // Permet de ne plus suivre un profil
   const unFollow = (evt) => {
     evt.preventDefault();
     axios
@@ -111,16 +143,19 @@ export default function PageProfil(props) {
       });
   };
 
+  // Permet de passer à la page d'édition du profil
   const handleEdit = (evt) => {
     evt.preventDefault();
     props.setCurrentPage('edit_page');
   };
 
+  // Permet de passer à la page d'accueil
   const homePageHandler = (evt) => {
     evt.preventDefault();
     props.setCurrentPage('home_page');
   };
 
+  // Permet de supprimer le compte
   const handleDelete = () => {
     axios
       .delete(`/user/${props.myLogin}`, {
@@ -139,30 +174,118 @@ export default function PageProfil(props) {
       });
   };
 
+  // Permet de récupérer la liste des amis
   const getListAmis = () => {
     setAfficherAmis(!afficherAmis);
-    if (afficherAmis === false) {
-      axios
-        .get(`/user/${props.userProfil}/friends`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-          credentials: 'include',
-        })
-        .then((res) => {
-          console.log(res.data);
+  };
+  useEffect(() => {
+    axios
+      .get(`/user/${props.userProfil}/friends`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data === 'Aucun ami trouvé') {
+          setAmis(null);
+        } else {
           setAmis(res.data);
-        })
-        .catch((err) => {
-          console.log(err.response.data);
-        });
-    }
+        }
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+
+    axios
+      .get(`/user/${props.myLogin}/statistique`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        console.log(res.data);
+        setAmiStar(res.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, [afficherAmis, props.userProfil]);
+
+  // Permet de bloquer un utilisateur
+  const blocked = (evt) => {
+    evt.preventDefault();
+    const data = {
+      blackLogin: props.userProfil,
+    };
+    axios
+      .put(`/blacklist/${props.myLogin}`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsBlocked(true);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
   };
 
-  const bloquer = (evt) => {
+  // Permet de debloquer un utilisateur
+  const unBlocked = (evt) => {
     evt.preventDefault();
+    const data = {
+      blackLogin: props.userProfil,
+    };
+    axios
+      .delete(`/blacklist/${props.myLogin}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        params: data,
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsBlocked(false);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
   };
+
+  // Permet de récupérer la liste des utilisateurs bloqués
+  const getListBlocked = () => {
+    setAfficherBlacklist(!afficherBlacklist);
+  };
+  useEffect(() => {
+    axios
+      .get(`/blacklist/${props.myLogin}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        credentials: 'include',
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data === 'Liste noire vide') {
+          setBlockedUsers(null);
+        } else setBlockedUsers(res.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, [afficherBlacklist, props.myLogin]);
 
   return (
     <div className="profil">
@@ -174,23 +297,41 @@ export default function PageProfil(props) {
           {firstName} {lastName}{' '}
           <span className="tag">@{props.userProfil}</span>
         </h3>
+        <div>
+          <p>{naissance}</p>
+          <p>{ville}</p>
+          <p>{description}</p>
+        </div>
         {props.myLogin === props.userProfil ? (
           <div className="headerHome">
             <button onClick={getListAmis}>Amis</button>
+            <button onClick={getListBlocked}>Utilisateurs bloqués</button>
             <button onClick={handleEdit}>Editer le profil</button>
             <button onClick={handleDelete}>Supprimer mon compte</button>
           </div>
-        ) : isAbonne === false ? (
+        ) : isAbonne === false && isBlocked === false ? (
           <div className="headerHome">
             <button onClick={getListAmis}>Amis</button>
             <button onClick={Follow}>Suivre</button>
-            <button onClick={Follow}>Bloquer</button>
+            <button onClick={blocked}>Bloquer</button>
+          </div>
+        ) : isAbonne === false && isBlocked === true ? (
+          <div className="headerHome">
+            <button onClick={getListAmis}>Amis</button>
+            <button onClick={Follow}>Suivre</button>
+            <button onClick={unBlocked}>Débloquer</button>
+          </div>
+        ) : isAbonne === true && isBlocked == true ? (
+          <div className="headerHome">
+            <button onClick={getListAmis}>Amis</button>
+            <button onClick={unFollow}>Ne plus suivre</button>
+            <button onClick={unBlocked}>Débloquer</button>
           </div>
         ) : (
           <div className="headerHome">
             <button onClick={getListAmis}>Amis</button>
             <button onClick={unFollow}>Ne plus suivre</button>
-            <button onClick={Follow}>Bloquer</button>
+            <button onClick={blocked}>Bloquer</button>
           </div>
         )}
       </div>
@@ -198,7 +339,17 @@ export default function PageProfil(props) {
       {afficherAmis && (
         <div>
           <h2>Amis</h2>
+          <div>AmiStar : {amiStar}</div>
           <ListeProfils profils={amis} setCurrentPage={props.setCurrentPage} />
+        </div>
+      )}
+      {afficherBlacklist && props.myLogin === props.userProfil && (
+        <div>
+          <h2>Utilisateurs bloqués</h2>
+          <ListeProfils
+            profils={blockedUsers}
+            setCurrentPage={props.setCurrentPage}
+          />
         </div>
       )}
       <div>

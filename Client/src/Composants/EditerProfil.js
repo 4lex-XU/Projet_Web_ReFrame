@@ -7,6 +7,9 @@ export default function EditerProfil(props) {
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
   const [newFirstName, setNewFirstName] = useState('');
   const [newLastName, setNewLastName] = useState('');
+  const [ville, setVille] = useState('');
+  const [naissance, setNaissance] = useState('');
+  const [description, setDescription] = useState('');
   const [PassOk, setPassOk] = useState(true);
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
@@ -29,6 +32,15 @@ export default function EditerProfil(props) {
   const getNewLastName = (evt) => {
     setNewLastName(evt.target.value);
   };
+  const getNaissance = (evt) => {
+    setNaissance(evt.target.value);
+  };
+  const getDescription = (evt) => {
+    setDescription(evt.target.value);
+  };
+  const getVille = (evt) => {
+    setVille(evt.target.value);
+  };
 
   useEffect(() => {
     axios
@@ -44,6 +56,9 @@ export default function EditerProfil(props) {
         setLastName(res.data.lastName);
         setLogin(res.data.login);
         setPassword(res.data.password);
+        setNaissance(res.data.naissance);
+        setDescription(res.data.description);
+        setVille(res.data.ville);
       })
       .catch((err) => {
         console.log(err.response.data);
@@ -59,6 +74,9 @@ export default function EditerProfil(props) {
         confirmpassword: newPasswordConfirm,
         firstname: newFirstName,
         lastname: newLastName,
+        naissance: naissance,
+        description: description,
+        ville: ville,
       };
       console.log(data);
       axios
@@ -134,6 +152,30 @@ export default function EditerProfil(props) {
           className="newLastName"
           onChange={getNewLastName}
           placeholder={lastName}
+        />
+        <label htmlFor="newCountry">New Country</label>
+        <input
+          type="text"
+          id="newCountry"
+          className="newCountry"
+          onChange={getVille}
+          placeholder={ville}
+        />
+        <label htmlFor="newDateBirth">New Date Birth</label>
+        <input
+          type="text"
+          id="newDateBirth"
+          className="newDateBirth"
+          onChange={getNaissance}
+          placeholder={naissance}
+        />
+        <label htmlFor="newDesciption">New description</label>
+        <input
+          type="text"
+          id="newDesciption"
+          className="newDesciption"
+          onChange={getDescription}
+          placeholder={description}
         />
         <button type="submit">Valider</button>
         {!PassOk && (

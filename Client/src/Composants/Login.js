@@ -1,9 +1,9 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState } from 'react';
+import axios from 'axios';
 
 export default function Login(props) {
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
 
   const getLogin = (evt) => {
@@ -12,6 +12,7 @@ export default function Login(props) {
   const getPasseword = (evt) => {
     setPassword(evt.target.value);
   };
+
   const submissionHandler = (evt) => {
     evt.preventDefault();
     setError(null);
@@ -20,28 +21,27 @@ export default function Login(props) {
       password: password,
     };
     axios
-      .post("/user/login", data, {
+      .post('/user/login', data, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         withCredentials: true,
-        credentials: 'include'
+        credentials: 'include',
       })
       .then((response) => {
         console.log(response.data);
         props.setMyLogin(login);
         props.getConnected();
-        props.setCurrentPage("home_page");
+        props.setCurrentPage('home_page');
       })
       .catch((error) => {
-        console.log(error.response.data)
+        console.log(error.response.data);
         setError(error.response.data);
-      }
-    );
+      });
   };
   const signinHandler = (evt) => {
     evt.preventDefault();
-    props.setCurrentPage("signin_page");
+    props.setCurrentPage('signin_page');
   };
   return (
     <div>
@@ -51,12 +51,14 @@ export default function Login(props) {
         <label htmlFor="mdp">Password</label>
         <input type="password" id="mdp" onChange={getPasseword} />
         <div>
-          <button onClick={submissionHandler}>
-            Log In
-          </button>
+          <button onClick={submissionHandler}>Log In</button>
           <button type="reset">Reset</button>
         </div>
-        {error && <p style={{ color: "red" }}>{error.message} {error.detail}</p>}
+        {error && (
+          <p style={{ color: 'red' }}>
+            {error.message} {error.detail}
+          </p>
+        )}
         <a className="signin" href="a" onClick={signinHandler}>
           pas encore inscrit ?
         </a>

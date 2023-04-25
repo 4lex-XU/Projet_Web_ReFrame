@@ -233,7 +233,16 @@ function init(db) {
       });
       return;
     }
-    const { login, password, confirmpassword, lastname, firstname } = req.body;
+    const {
+      login,
+      password,
+      confirmpassword,
+      lastname,
+      firstname,
+      naissance,
+      description,
+      ville,
+    } = req.body;
     if (!(await users.exists(client, req.params.login))) {
       res.status(403).json({
         status: 403,
@@ -251,7 +260,17 @@ function init(db) {
       return;
     }
     users
-      .edit(client, req.params.login, login, password, lastname, firstname)
+      .edit(
+        client,
+        req.params.login,
+        login,
+        password,
+        lastname,
+        firstname,
+        naissance,
+        description,
+        ville
+      )
       .then(() => {
         req.session.login = login;
         res.status(200).send('Modification enregistré');
@@ -277,7 +296,7 @@ function init(db) {
     users
       .statistique(client, req.params.login)
       .then((friend_login) => {
-        res.status(201).send(`L'ami le plus actif est ${friend_login}`);
+        res.status(201).send(friend_login);
       })
       .catch((e) =>
         res.status(500).json({
@@ -793,6 +812,7 @@ function init(db) {
 
     //DELETE Utilisateur de la liste noire
     .delete(async (req, res, next) => {
+      console.log(req.session.userid);
       if (!req.session.userid) {
         res.status(401).json({
           status: 401,
@@ -800,15 +820,14 @@ function init(db) {
         });
         return;
       }
-      const { blackLogin } = req.body;
-      if (!blackLogin) {
+      if (!req.query.blackLogin) {
         res.status(400).json({
           status: 400,
           message: 'Champs manquants',
         });
         return;
       }
-      if (!(await users.exists(client, blackLogin))) {
+      if (!(await users.exists(client, req.query.blackLogin))) {
         res.status(404).json({
           status: 404,
           message: 'Utilisateur introuvable',
@@ -816,7 +835,13 @@ function init(db) {
         return;
       }
 
-      if (!(await nofriends.isBlack(client, req.params.login, blackLogin))) {
+      if (
+        !(await nofriends.isBlack(
+          client,
+          req.params.login,
+          req.query.blackLogin
+        ))
+      ) {
         res.status(404).json({
           status: 404,
           message: 'Utilisateur non bloqué',
@@ -824,7 +849,7 @@ function init(db) {
         return;
       }
       nofriends
-        .delete(client, req.params.login, blackLogin)
+        .delete(client, req.params.login, req.query.blackLogin)
         .then((result) => {
           res.status(201).send(result);
         })

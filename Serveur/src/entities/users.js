@@ -108,7 +108,17 @@ class Users {
     });
   }
 
-  edit(client, oldlogin, login, password, lastName, firstName) {
+  edit(
+    client,
+    oldlogin,
+    login,
+    password,
+    lastName,
+    firstName,
+    naissance,
+    description,
+    ville
+  ) {
     return new Promise((resolve, reject) => {
       const update = {};
       if (login !== '') {
@@ -122,6 +132,15 @@ class Users {
       }
       if (firstName !== '') {
         update['firstName'] = firstName;
+      }
+      if (naissance !== '') {
+        update['naissance'] = naissance;
+      }
+      if (description !== '') {
+        update['description'] = description;
+      }
+      if (ville !== '') {
+        update['ville'] = ville;
       }
       client
         .db(dbName)
