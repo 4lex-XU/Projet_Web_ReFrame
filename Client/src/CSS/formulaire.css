@@ -23,6 +23,17 @@ input {
   max-width: 300px;
 }
 
+textarea {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  width: 100%;
+  max-width: 300px;
+  resize: none;
+}
+
 form button {
   margin-top: 20px;
   padding: 10px 20px;
@@ -35,7 +46,7 @@ form button {
   cursor: pointer;
 }
 
-button[type="reset"] {
+button[type='reset'] {
   margin-left: 10px;
   background-color: #ccc;
   color: #333;
@@ -57,11 +68,12 @@ button[type="reset"] {
   padding: 0px;
   border: 0;
   background-color: white;
+  margin-right: 7%;
   width: 100%;
   min-width: 300px;
 }
 .barreRecherche input {
-  width: 170px;
+  width: 300px;
 }
 .barreRecherche button {
   margin-left: 1px;

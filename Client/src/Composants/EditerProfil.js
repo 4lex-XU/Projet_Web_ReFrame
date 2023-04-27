@@ -113,31 +113,7 @@ export default function EditerProfil(props) {
   return (
     <div className="EditerProfil">
       <form onSubmit={Edit}>
-        <label htmlFor="newLogin">New login</label>
-        <input
-          type="text"
-          id="newLogin"
-          className="newLogin"
-          onChange={getNewLogin}
-          placeholder={login}
-        />
-        <label htmlFor="newPassword">New password</label>
-        <input
-          type="password"
-          id="newPassword"
-          className="newPassword"
-          onChange={getNewPassword}
-          placeholder={'......'}
-        />
-        <label htmlFor="newPasswordConfirm">Confirm new password</label>
-        <input
-          type="password"
-          id="newPasswordConfirm"
-          className="newPasswordConfirm"
-          onChange={getNewPasswordConfirm}
-          placeholder={'......'}
-        />
-        <label htmlFor="newFirstName">New firstname</label>
+        <label htmlFor="newFirstName">Firstname</label>
         <input
           type="text"
           id="newFirstName"
@@ -145,7 +121,7 @@ export default function EditerProfil(props) {
           onChange={getNewFirstName}
           placeholder={firstName}
         />
-        <label htmlFor="newLastName">New lastname</label>
+        <label htmlFor="newLastName">Lastname</label>
         <input
           type="text"
           id="newLastName"
@@ -153,7 +129,24 @@ export default function EditerProfil(props) {
           onChange={getNewLastName}
           placeholder={lastName}
         />
-        <label htmlFor="newCountry">New Country</label>
+        <label htmlFor="newLogin">Login</label>
+        <input
+          type="text"
+          id="newLogin"
+          className="newLogin"
+          onChange={getNewLogin}
+          placeholder={login}
+        />
+        <label htmlFor="newDesciption">Bio</label>
+        <textarea
+          style={{ resize: 'none', with: '100%' }}
+          type="text"
+          id="newDesciption"
+          className="newDesciption"
+          onChange={getDescription}
+          placeholder={description}
+        />
+        <label htmlFor="newCountry">Country</label>
         <input
           type="text"
           id="newCountry"
@@ -161,7 +154,7 @@ export default function EditerProfil(props) {
           onChange={getVille}
           placeholder={ville}
         />
-        <label htmlFor="newDateBirth">New Date Birth</label>
+        <label htmlFor="newDateBirth">Date Birth</label>
         <input
           type="text"
           id="newDateBirth"
@@ -169,14 +162,23 @@ export default function EditerProfil(props) {
           onChange={getNaissance}
           placeholder={naissance}
         />
-        <label htmlFor="newDesciption">New description</label>
+        <label htmlFor="newPassword">Password</label>
         <input
-          type="text"
-          id="newDesciption"
-          className="newDesciption"
-          onChange={getDescription}
-          placeholder={description}
+          type="password"
+          id="newPassword"
+          className="newPassword"
+          onChange={getNewPassword}
+          placeholder={'......'}
         />
+        <label htmlFor="newPasswordConfirm">Confirm password</label>
+        <input
+          type="password"
+          id="newPasswordConfirm"
+          className="newPasswordConfirm"
+          onChange={getNewPasswordConfirm}
+          placeholder={'......'}
+        />
+
         <button type="submit">Valider</button>
         {!PassOk && (
           <p style={{ color: 'red' }}>Les mots de passe ne correspondent pas</p>

@@ -1,12 +1,10 @@
-import Logout from './Logout';
 import ListeMessages from './ListeMessages.js';
 import SaisieMessage from './SaisieMessage';
 import BarreRecherche from './BarreRecherche';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ListeProfils from './ListeProfils';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { Button } from 'react-bootstrap';
 
 export default function HomePage(props) {
   const [saisir, setSaisir] = useState(false);
@@ -18,10 +16,6 @@ export default function HomePage(props) {
   const handlerSaisie = (evt) => {
     if (saisir) setSaisir(false);
     else setSaisir(true);
-  };
-  const pageProfilHandler = (evt) => {
-    evt.preventDefault();
-    props.setCurrentPage(props.myLogin);
   };
 
   useEffect(() => {
@@ -46,18 +40,17 @@ export default function HomePage(props) {
   return (
     <div>
       <div className="headerHome">
-        <button onClick={pageProfilHandler}>
-          <FontAwesomeIcon icon={faUserCircle} size="3x" />
-          Profil
-        </button>
+        <Button
+          style={{ backgroundColor: '#9c9cdc', fontWeight: 'bold' }}
+          onClick={handlerSaisie}
+        >
+          Nouvelle Frame
+        </Button>
         <BarreRecherche
           setResultat={setResultatRecherche}
           setFaitRecherche={setFaitRecherche}
           faitRecherche={faitRecherche}
         />
-        <button id="saisie" onClick={handlerSaisie}>
-          Nouvelle Frame
-        </button>
       </div>
       {saisir && (
         <SaisieMessage
@@ -94,9 +87,6 @@ export default function HomePage(props) {
           />
         </article>
       )}
-      <footer>
-        <Logout setLogout={props.logout} />
-      </footer>
     </div>
   );
 }

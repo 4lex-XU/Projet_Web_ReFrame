@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import ListeMessages from './ListeMessages';
 import ListeProfils from './ListeProfils';
-import Logout from './Logout';
-import axios from 'axios';
+import avatar from '../Images/avatar.png';
+import entete from '../Images/entete.png';
+import '../CSS/profil.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCake,
+  faMapMarkerAlt,
+  faStar,
+} from '@fortawesome/free-solid-svg-icons';
+
+import axios from 'axios';
 
 export default function PageProfil(props) {
   const [isAbonne, setIsAbonne] = useState(null);
@@ -149,12 +156,6 @@ export default function PageProfil(props) {
     props.setCurrentPage('edit_page');
   };
 
-  // Permet de passer à la page d'accueil
-  const homePageHandler = (evt) => {
-    evt.preventDefault();
-    props.setCurrentPage('home_page');
-  };
-
   // Permet de supprimer le compte
   const handleDelete = () => {
     axios
@@ -289,62 +290,106 @@ export default function PageProfil(props) {
 
   return (
     <div className="profil">
-      <div className="headerHome">
-        <button onClick={homePageHandler}>
-          <FontAwesomeIcon icon={faHome} size="3x" />
-        </button>
-        <h3 className="prenom-nom">
-          {firstName} {lastName}{' '}
-          <span className="tag">@{props.userProfil}</span>
-        </h3>
-        <div>
-          <p>{naissance}</p>
-          <p>{ville}</p>
-          <p>{description}</p>
+      <div className="headerProfil">
+        <div className="entete">
+          <img src={entete} />
         </div>
-        {props.myLogin === props.userProfil ? (
-          <div className="headerHome">
-            <button onClick={getListAmis}>Amis</button>
-            <button onClick={getListBlocked}>Utilisateurs bloqués</button>
-            <button onClick={handleEdit}>Editer le profil</button>
-            <button onClick={handleDelete}>Supprimer mon compte</button>
+        <div className="avatar">
+          <img src={avatar} />
+        </div>
+        <div className="header-info">
+          <div className="prenom-nom">
+            {firstName} {lastName}
           </div>
-        ) : isAbonne === false && isBlocked === false ? (
-          <div className="headerHome">
-            <button onClick={getListAmis}>Amis</button>
-            <button onClick={Follow}>Suivre</button>
-            <button onClick={blocked}>Bloquer</button>
-          </div>
-        ) : isAbonne === false && isBlocked === true ? (
-          <div className="headerHome">
-            <button onClick={getListAmis}>Amis</button>
-            <button onClick={Follow}>Suivre</button>
-            <button onClick={unBlocked}>Débloquer</button>
-          </div>
-        ) : isAbonne === true && isBlocked == true ? (
-          <div className="headerHome">
-            <button onClick={getListAmis}>Amis</button>
-            <button onClick={unFollow}>Ne plus suivre</button>
-            <button onClick={unBlocked}>Débloquer</button>
-          </div>
-        ) : (
-          <div className="headerHome">
-            <button onClick={getListAmis}>Amis</button>
-            <button onClick={unFollow}>Ne plus suivre</button>
-            <button onClick={blocked}>Bloquer</button>
-          </div>
-        )}
+          <div className="tag">@{props.userProfil}</div>
+        </div>
+        <div className="list-info">
+          <p>
+            <p>{description}</p>
+            <FontAwesomeIcon icon={faCake} /> {naissance}
+            {'  '}
+            <FontAwesomeIcon icon={faMapMarkerAlt} /> {ville}
+          </p>
+        </div>
+        <div className="btn-group">
+          {props.myLogin === props.userProfil ? (
+            <div className="button-container">
+              <button className="btn btn-secondary" onClick={getListAmis}>
+                Amis
+              </button>
+              <button className="btn btn-secondary" onClick={getListBlocked}>
+                Utilisateurs bloqués
+              </button>
+              <button className="btn btn-secondary" onClick={handleEdit}>
+                Editer le profil
+              </button>
+              <button className="btn btn-secondary" onClick={handleDelete}>
+                Supprimer mon compte
+              </button>
+            </div>
+          ) : isAbonne === false && isBlocked === false ? (
+            <div className="button-container">
+              <button className="btn btn-secondary" onClick={getListAmis}>
+                Amis
+              </button>
+              <button className="btn btn-secondary" onClick={Follow}>
+                Suivre
+              </button>
+              <button className="btn btn-secondary" onClick={blocked}>
+                Bloquer
+              </button>
+            </div>
+          ) : isAbonne === false && isBlocked === true ? (
+            <div className="button-container">
+              <button className="btn btn-secondary" onClick={getListAmis}>
+                Amis
+              </button>
+              <button className="btn btn-secondary" onClick={Follow}>
+                Suivre
+              </button>
+              <button className="btn btn-secondary" onClick={unBlocked}>
+                Débloquer
+              </button>
+            </div>
+          ) : isAbonne === true && isBlocked === true ? (
+            <div className="button-container">
+              <button className="btn btn-secondary" onClick={getListAmis}>
+                Amis
+              </button>
+              <button className="btn btn-secondary" onClick={unFollow}>
+                Ne plus suivre
+              </button>
+              <button className="btn btn-secondary" onClick={unBlocked}>
+                Débloquer
+              </button>
+            </div>
+          ) : (
+            <div className="button-container">
+              <button className="btn btn-secondary" onClick={getListAmis}>
+                Amis
+              </button>
+              <button className="btn btn-secondary" onClick={unFollow}>
+                Ne plus suivre
+              </button>
+              <button className="btn btn-secondary" onClick={blocked}>
+                Bloquer
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {afficherAmis && (
-        <div>
+        <div className="liste-amis">
           <h2>Amis</h2>
-          <div>AmiStar : {amiStar}</div>
+          <div>
+            <FontAwesomeIcon icon={faStar} beat></FontAwesomeIcon> {amiStar}
+          </div>
           <ListeProfils profils={amis} setCurrentPage={props.setCurrentPage} />
         </div>
       )}
       {afficherBlacklist && props.myLogin === props.userProfil && (
-        <div>
+        <div className="liste-amis">
           <h2>Utilisateurs bloqués</h2>
           <ListeProfils
             profils={blockedUsers}
@@ -352,7 +397,7 @@ export default function PageProfil(props) {
           />
         </div>
       )}
-      <div>
+      <div className="liste-messages">
         <ListeMessages
           messages={messages}
           setCurrentPage={props.setCurrentPage}
@@ -362,7 +407,6 @@ export default function PageProfil(props) {
           myLogin={props.myLogin}
         />
       </div>
-      <Logout setLogout={props.logout} />
     </div>
   );
 }

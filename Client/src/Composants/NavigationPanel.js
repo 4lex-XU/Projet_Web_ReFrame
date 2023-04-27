@@ -1,43 +1,60 @@
-import Login from './Login';
-import Signin from './Signin';
-import HomePage from './HomePage';
-import PageProfil from './PageProfil';
-import EditerProfil from './EditerProfil';
+import { Navbar, Nav } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faHome,
+  faUser,
+  faEdit,
+  faPowerOff,
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function NavigationPanel(props) {
   return (
-    <nav>
-      {props.currentPage === 'signin_page' ? (
-        <Signin setCurrentPage={props.setCurrentPage} />
-      ) : props.isConnected ? (
-        props.currentPage === 'home_page' ? (
-          <HomePage
-            myLogin={props.myLogin}
-            logout={props.logout}
-            setCurrentPage={props.setCurrentPage}
-          />
-        ) : props.currentPage === 'edit_page' ? (
-          <EditerProfil
-            myLogin={props.myLogin}
-            setMyLogin={props.setMyLogin}
-            logout={props.logout}
-            setCurrentPage={props.setCurrentPage}
-          />
-        ) : (
-          <PageProfil
-            myLogin={props.myLogin}
-            userProfil={props.currentPage}
-            logout={props.logout}
-            setCurrentPage={props.setCurrentPage}
-          />
-        )
-      ) : (
-        <Login
-          setMyLogin={props.setMyLogin}
-          getConnected={props.login}
-          setCurrentPage={props.setCurrentPage}
-        />
-      )}
-    </nav>
+    <Navbar expand="lg">
+      <Navbar.Toggle />
+      <Navbar.Collapse id="navbar">
+        <Nav className="navigation">
+          {props.isConnected ? (
+            <>
+              <Nav.Link
+                href="#"
+                onClick={() => props.setCurrentPage('home_page')}
+              >
+                <FontAwesomeIcon icon={faHome} /> Accueil
+              </Nav.Link>
+              <Nav.Link
+                href="#"
+                onClick={() => props.setCurrentPage(props.myLogin)}
+              >
+                <FontAwesomeIcon icon={faUser} /> Profil
+              </Nav.Link>
+              <Nav.Link
+                href="#"
+                onClick={() => props.setCurrentPage('edit_page')}
+              >
+                <FontAwesomeIcon icon={faEdit} /> Editer profil
+              </Nav.Link>
+              <Nav.Link href="#" onClick={props.setLogout}>
+                <FontAwesomeIcon icon={faPowerOff} /> Déconnexion
+              </Nav.Link>
+            </>
+          ) : (
+            <>
+              <Nav.Link
+                href="#"
+                onClick={() => props.setCurrentPage('signin_page')}
+              >
+                Inscription
+              </Nav.Link>
+              <Nav.Link
+                href="#"
+                onClick={() => props.setCurrentPage('login_page')}
+              >
+                Connexion
+              </Nav.Link>
+            </>
+          )}
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>
   );
 }

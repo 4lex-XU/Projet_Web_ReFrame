@@ -67,7 +67,7 @@ export default function Signin(props) {
         <input id="signin_login" onChange={getLogin} />
         <label htmlFor="signin_mdp1">Password</label>
         <input type="password" id="signin_mdp1" onChange={getPass} />
-        <label htmlFor="signin_mdp2">Password (2)</label>
+        <label htmlFor="signin_mdp2">Confirm Password</label>
         <input type="password" id="signin_mdp2" onChange={getPassVerif} />
         {passOK && (
           <p style={{ color: 'red' }}>Veuillez reconfirmer le mot de passe</p>
