@@ -22,7 +22,3 @@
   border-radius: 10px;
   cursor: pointer;
 }
-
-.message textarea {
-  max-width: 90%;
-}
